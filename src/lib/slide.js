@@ -6,7 +6,8 @@
 export const SLIDE_MS = 180;
 const EASING = "cubic-bezier(0.2, 0, 0, 1)";
 
-const stillness = () => globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
+/** Whether motion is turned down in the system's settings, as a MediaQueryList, or nothing where it can't be asked. */
+export const stillness = () => globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
 
 // Each element's slide under way, and its overflow from before the first of them: one
 // started while another's under way, as on closing a file still opening, takes over

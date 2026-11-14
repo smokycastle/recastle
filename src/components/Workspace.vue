@@ -58,7 +58,7 @@ import {
   storeProblem,
   writeJson,
 } from "../lib/storage.js";
-import { panes, savePanes } from "../lib/panes.js";
+import { usePaneSizes } from "../lib/panes.js";
 import { useGitActions } from "../lib/gitActions.js";
 import { useUndo } from "../lib/undo.js";
 import { useStatusCard } from "../lib/statusCard.js";
@@ -952,9 +952,14 @@ const unlistenProgress = thisWindow.listen("remote-progress", (event) => {
 });
 onBeforeUnmount(() => unlistenProgress.then((unlisten) => unlisten()));
 
-// --- Pane widths -------------------------------------------------------------------
+// --- Pane sizes --------------------------------------------------------------------
 
-// The same in every tab (see panes.js).
+// Its repository's own, as they were last set for it, in any tab; drawn at `shownPanes`,
+// which slide from the last tab's as this one comes to show (see panes.js).
+const { sizes: panes, save: savePanes, shown: shownPanes } = usePaneSizes(
+  () => overview.value?.path,
+  () => props.active,
+);
 
 function startResize(event, pane, min, max) {
   const startWidth = panes[pane];
@@ -1399,7 +1404,7 @@ const breadcrumb = computed(() => {
   <div
     v-if="overview"
     class="window"
-    :style="{ gridTemplateColumns: `${panes.sidebar}px minmax(280px, ${panes.history}px) minmax(320px, 1fr)` }"
+    :style="{ gridTemplateColumns: `${shownPanes.sidebar}px minmax(280px, ${shownPanes.history}px) minmax(320px, 1fr)` }"
   >
     <Sidebar
       v-model:selected="selected"
@@ -1882,7 +1887,8 @@ const breadcrumb = computed(() => {
       v-if="terminalLoaded"
       v-show="terminalOpen"
       ref="terminalPanel"
-      v-model:height="panes.terminal"
+      :height="shownPanes.terminal"
+      @update:height="(height) => (panes.terminal = height)"
       :path="overview.path"
       :name="overview.name"
       @resized="savePanes"
