@@ -261,6 +261,38 @@ body::after {
   }
 }
 
+/* A dialog (each a .dialog in a .backdrop, see ConfirmDialog.vue and the others) slides
+   down into place as it opens, fading in, as the page behind it dims. Only as it opens:
+   it goes at once, to leave the way clear for what was asked. Where motion is turned
+   down in the system's settings, it's there at once. */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    background-color: transparent;
+  }
+}
+
+.backdrop {
+  animation: backdrop-in 0.18s ease-out;
+}
+
+.backdrop > .dialog {
+  animation: dialog-in 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .backdrop > .dialog {
+    animation: none;
+  }
+}
+
 /* Settings › Diffs can switch to the traditional green and red. */
 :root[data-diff-colors="classic"] {
   --diff-added-bg: #dafbe1;
