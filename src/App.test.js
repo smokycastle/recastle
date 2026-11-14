@@ -121,9 +121,12 @@ async function settle(turns = 10) {
   }
 }
 
-// Waits for `seen()` to be true, a turn at a time, for a while.
+// Waits for `seen()` to be true, a turn at a time, for up to two seconds: by the clock,
+// not a count of turns, which a slow machine, as a busy CI runner, can run through
+// before what's waited for has had the time it needs.
 async function until(seen) {
-  for (let i = 0; i < 50 && !seen(); i++) await settle(1);
+  const giveUpAt = performance.now() + 2000;
+  while (!seen() && performance.now() < giveUpAt) await settle(1);
   expect(seen()).toBe(true);
 }
 
