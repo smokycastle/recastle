@@ -13,6 +13,7 @@ import { isMac } from "./platform.js";
 import { askConfirm } from "./overlays.js";
 import { settings } from "./settings.js";
 import { OSC, SUPPORTED_REPLY, applyReport, describe, dropRunning, parseReport, summarize } from "./programStatus.js";
+import { noteReports, stopWaiting } from "./unreported.js";
 
 // The terminals in the panel below the history, by repository: each tab is the user's
 // shell, started in the repository's folder (see terminal.rs). They keep running
@@ -200,7 +201,9 @@ export function openTerminal(path, { command = null, input = null, kind = "shell
 
   // An agent tab is called after its agent until its program names it. `status` is
   // what its program last said it's doing (see Status below), and `unseen`, that it's
-  // finished or needs you since you last looked.
+  // finished or needs you since you last looked. `unreported`, that Claude Code's in
+  // front without saying what it's doing, as when the tab shows a session running in
+  // the background (see unreported.js).
   const tab = reactive({
     key: nextKey++,
     kind,
@@ -209,6 +212,7 @@ export function openTerminal(path, { command = null, input = null, kind = "shell
     id: null,
     status: null,
     unseen: false,
+    unreported: false,
   });
   // `front` is the program in front in it, as last checked (see checkFront).
   tab.session = markRaw({
@@ -363,7 +367,10 @@ function checkFront(tab) {
   setTimeout(() => {
     if (tab.id == null) return;
     invoke("terminal_foreground", { id: tab.id })
-      .then((name) => (session.front = name))
+      .then((name) => {
+        session.front = name;
+        noteReports(tab);
+      })
       .catch(() => {});
     endedRunning(tab);
   }, 500);
@@ -410,6 +417,7 @@ export function removeTab(path, tab) {
   if (tab.id != null) invoke("terminal_close", { id: tab.id }).catch(() => {});
   // One whose shell is still starting is hung up as it does (see startTab).
   tab.session.closed = true;
+  stopWaiting(tab);
   withdrawNotifications(tab);
   tab.session.term.dispose();
   tab.session.el.remove();
@@ -612,6 +620,7 @@ function onStatus(path, tab, body) {
   } else if (report) {
     applyReport(tab.session.records, report);
     updateStatus(path, tab);
+    noteReports(tab);
   }
   return true;
 }

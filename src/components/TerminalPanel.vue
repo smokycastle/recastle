@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-import { ChevronDown, Ellipsis, Plus, SquareTerminal, X } from "lucide-vue-next";
+import { ChevronDown, Ellipsis, Plug, Plus, SquareTerminal, X } from "lucide-vue-next";
 import { askConfirm, openForm, openMenu } from "../lib/overlays.js";
 import { isMac, NEW_TERMINAL_KEYS, shortcut } from "../lib/platform.js";
 import { dragEdge } from "../lib/resize.js";
@@ -69,7 +69,14 @@ async function show() {
 watch(active, show);
 onMounted(show);
 
-// What a tab's program last said it's doing, as its tooltip says, after its name.
+// What a tab's tooltip says after its name: that what Claude Code's doing can't be
+// seen, and why, and what to do about it (see unreported.js); or what its program last
+// said it's doing.
+const UNREPORTED =
+  "Claude Code isn't telling Palace what it's doing, so Palace can't show when it's working. Most often, its session is running in the background and only shown here. To see it, end that session, then resume it in this tab.";
+const tabTitle = (tab) => [label(tab), tab.unreported ? UNREPORTED : statusText(tab.status)].filter(Boolean).join(": ");
+
+// What a tab's program last said it's doing.
 function statusText(status) {
   if (!status) return "";
   if (status.state === "blocked") {
@@ -334,13 +341,15 @@ function startResize(event) {
           class="tab"
           :class="[{ active: tab.key === group.active }, classOf(tab.key)]"
           :data-key="tab.key"
-          :title="[label(tab), statusText(tab.status)].filter(Boolean).join(': ')"
+          :title="tabTitle(tab)"
           @pointerdown="onTabPointerDown($event, tab)"
           @click="group.active = tab.key"
           @auxclick.middle="closeTab(tab)"
           @contextmenu.prevent="tabMenu($event, tab)"
         >
           <Spinner v-if="tab.status?.state === 'working'" :size="13" />
+          <!-- Claude Code whose state can't be seen: a plug, not plugged into Palace. -->
+          <Plug v-else-if="tab.unreported" class="unreported" :size="15" :stroke-width="1.75" />
           <AgentIcon v-else-if="tab.kind === 'agent'" :name="tab.agent" />
           <SquareTerminal v-else :size="13" :stroke-width="1.75" />
           <span class="tab-label">{{ label(tab) }}</span>
@@ -463,6 +472,11 @@ function startResize(event) {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* Claude Code whose state can't be seen (see unreported.js): a plug, not plugged in. */
+.unreported {
+  color: var(--text-secondary);
 }
 
 /* A tab whose program finished or needs you since you last looked at it. */
