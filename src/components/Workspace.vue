@@ -59,6 +59,7 @@ import {
   writeJson,
 } from "../lib/storage.js";
 import { usePaneSizes } from "../lib/panes.js";
+import { settings } from "../lib/settings.js";
 import { useGitActions } from "../lib/gitActions.js";
 import { useUndo } from "../lib/undo.js";
 import { useStatusCard } from "../lib/statusCard.js";
@@ -954,11 +955,13 @@ onBeforeUnmount(() => unlistenProgress.then((unlisten) => unlisten()));
 
 // --- Pane sizes --------------------------------------------------------------------
 
-// Its repository's own, as they were last set for it, in any tab; drawn at `shownPanes`,
-// which slide from the last tab's as this one comes to show (see panes.js).
+// Its repository's own, as they were last set for it, in any tab, unless Settings says
+// every tab's to have the same; drawn at `shownPanes`, which slide from the last tab's as
+// this one comes to show (see panes.js).
 const { sizes: panes, save: savePanes, shown: shownPanes } = usePaneSizes(
   () => overview.value?.path,
   () => props.active,
+  () => settings.separatePaneSizes,
 );
 
 function startResize(event, pane, min, max) {

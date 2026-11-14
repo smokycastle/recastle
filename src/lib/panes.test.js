@@ -18,9 +18,9 @@ beforeEach(() => {
 });
 
 // A tab's pane sizes, showing the repository at `path`.
-const tabShowing = (path, active = () => true) => {
+const tabShowing = (path, active = () => true, separate = () => true) => {
   const repository = ref(path);
-  return { repository, ...mountComposable(() => usePaneSizes(() => repository.value, active)).result };
+  return { repository, ...mountComposable(() => usePaneSizes(() => repository.value, active, separate)).result };
 };
 
 test("each repository keeps its own pane sizes, one without starting at those last set", async () => {
@@ -123,4 +123,28 @@ test("a tab coming to show after one showing no repository is at its own sizes a
   expect({ ...a.shown }).toEqual({ sidebar: 250, history: 650, terminal: 350 });
   expect(frames).toHaveLength(0);
   vi.unstubAllGlobals();
+});
+
+test("set not to keep each repository's, every tab has the same, and takes them as they're set in any", async () => {
+  const separate = ref(true);
+  const a = tabShowing("/a", () => true, () => separate.value);
+  Object.assign(a.sizes, { sidebar: 250, history: 650, terminal: 350 });
+  a.save();
+  const b = tabShowing("/b", () => false, () => separate.value);
+  b.sizes.history = 500;
+  b.save();
+  expect(a.sizes.history).toBe(650);
+
+  separate.value = false;
+  await nextTick();
+  // Both those last set, /b's.
+  expect([a.sizes.history, b.sizes.history]).toEqual([500, 500]);
+  a.sizes.sidebar = 280;
+  a.save();
+  await nextTick();
+  expect(b.sizes.sidebar).toBe(280);
+  // Not kept as /a's own, which it has again once each keeps its own.
+  separate.value = true;
+  await nextTick();
+  expect(a.sizes.sidebar).toBe(250);
 });

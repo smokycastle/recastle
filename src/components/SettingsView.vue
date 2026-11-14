@@ -427,6 +427,16 @@ const SAMPLE = {
               </div>
               <label class="switch"><input v-model="settings.historyRefNames" type="checkbox" /><span /></label>
             </div>
+            <div class="item">
+              <div class="text">
+                <div class="title">Pane sizes for each tab</div>
+                <div class="desc">
+                  Each tab keeps its own sidebar, history and terminal sizes, and has them again wherever its repository
+                  is next opened. Off, every tab has the same, and resizing one resizes them all.
+                </div>
+              </div>
+              <label class="switch"><input v-model="settings.separatePaneSizes" type="checkbox" /><span /></label>
+            </div>
           </div>
         </section>
 

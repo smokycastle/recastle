@@ -5,7 +5,8 @@ import { readJson, writeJson } from "./storage.js";
 // How wide the sidebar and the history are, and how tall the terminal panel is: each
 // repository's own (see usePaneSizes), so a tab's are as they were last set for the
 // repository it shows, in whichever tab or window. `panes` here are those last set for
-// any, kept for a repository that's had none of its own.
+// any, kept for a repository that's had none of its own; and with Settings › Appearance
+// saying not to keep each repository's, every tab's.
 
 const KEY = "palace.paneWidths";
 
@@ -44,26 +45,27 @@ export function fitTerminal() {
 /**
  * A tab's pane sizes, for the repository at `path()` it shows: as they were last set for
  * that repository, in any tab or window, or for one that's had none, as they were last
- * set for any; the terminal panel no taller than there's room for. Returns:
+ * set for any; the terminal panel no taller than there's room for. With `separate()`
+ * false, as Settings can say, the same for every tab instead: those last set in any,
+ * each tab taking them as they're set. Returns:
  *   sizes    reactive, { sidebar, history, terminal }, which dragging an edge sets
  *   save()   for once one's been set
  *   shown    the sizes it's drawn at: `sizes`, but for a moment as the tab comes to show
  *            (`active()`), when they start at the last tab's, and slide to its own
  */
-export function usePaneSizes(path, active = () => true) {
+export function usePaneSizes(path, active = () => true, separate = () => true) {
   const sizes = reactive({ sidebar: panes.sidebar, history: panes.history, terminal: panes.terminal });
   const shown = reactive({ ...sizes });
   // The frame of a slide under way, or 0.
   let sliding = 0;
   const fit = () => (sizes.terminal = Math.min(sizes.terminal, tallestTerminal()));
-  watch(
-    path,
-    (now) => {
-      Object.assign(sizes, { sidebar: panes.sidebar, history: panes.history, terminal: panes.terminal }, readJson(SIZES_KEY, {})[now]);
-      fit();
-    },
-    { immediate: true },
-  );
+  const load = () => {
+    Object.assign(sizes, { sidebar: panes.sidebar, history: panes.history, terminal: panes.terminal }, separate() ? readJson(SIZES_KEY, {})[path()] : null);
+    fit();
+  };
+  watch([path, separate], load, { immediate: true });
+  // The same for every tab, each takes them as they're set in any.
+  watch(panes, () => separate() || load());
   watch(fits, fit);
 
   // Coming to show, it starts at the last tab's sizes, drawn so, then slides to its own,
@@ -111,7 +113,7 @@ export function usePaneSizes(path, active = () => true) {
     Object.assign(panes, set);
     writeJson(KEY, set);
     const at = path();
-    if (!at) return;
+    if (!at || !separate()) return;
     // Read afresh, with other windows' saves taken in, so theirs aren't saved over.
     const all = readJson(SIZES_KEY, {});
     delete all[at];

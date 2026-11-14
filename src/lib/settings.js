@@ -20,6 +20,10 @@ const DEFAULTS = {
   syntaxHighlighting: true,
   // Colorful icons for files and folders, by name, rather than plain outlines.
   fileIcons: true,
+  // Each repository keeps its own pane sizes, the sidebar's and the history's widths
+  // and the terminal panel's height, rather than every tab having the same (see
+  // panes.js).
+  separatePaneSizes: true,
   // Spell out each commit's branches and tags in the history, rather than a badge for
   // each kind with the names on hover (see refBadges.js).
   historyRefNames: false,
