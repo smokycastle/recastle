@@ -19,6 +19,7 @@ mod lost;
 mod markdown;
 #[cfg(target_os = "macos")]
 mod menu;
+mod migrate;
 mod notify;
 mod open;
 mod per_repo;
@@ -69,6 +70,8 @@ pub fn run() {
                     no_pinch_zoom(window);
                 }
             }
+            // What Palace saved, before anything's read from where Recastle keeps it.
+            migrate::bring_over(app.handle());
             #[cfg(target_os = "macos")]
             menu::set(app.handle())?;
             reopen::show_windows(app.handle());

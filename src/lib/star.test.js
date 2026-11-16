@@ -36,22 +36,22 @@ async function start(saved = {}) {
 test("doesn't ask the first day Palace is used, and remembers when that was", async () => {
   const { starRequest, readJson } = await start();
   expect(starRequest.value).toBeNull();
-  expect(readJson("palace.firstStarted")).toBe(NOW);
+  expect(readJson("recastle.firstStarted")).toBe(NOW);
 });
 
 test("asks once Palace has been in use for a day", async () => {
-  const { starRequest } = await start({ "palace.firstStarted": NOW - DAY });
+  const { starRequest } = await start({ "recastle.firstStarted": NOW - DAY });
   expect(starRequest.value).toBe("ask");
 });
 
 test("doesn't ask again once asked", async () => {
-  const { starRequest } = await start({ "palace.firstStarted": NOW - 30 * DAY, "palace.starAsked": true });
+  const { starRequest } = await start({ "recastle.firstStarted": NOW - 30 * DAY, "recastle.starAsked": true });
   expect(starRequest.value).toBeNull();
 });
 
 test("doesn't ask an account that has starred Palace already", async () => {
   vi.mocked(invoke).mockImplementation(async (command) => command === "github_starred_palace");
-  const { starRequest, readJson } = await start({ "palace.firstStarted": NOW - DAY });
+  const { starRequest, readJson } = await start({ "recastle.firstStarted": NOW - DAY });
   expect(starRequest.value).toBeNull();
-  expect(readJson("palace.starAsked")).toBe(true);
+  expect(readJson("recastle.starAsked")).toBe(true);
 });

@@ -50,7 +50,7 @@ describe("remembering a repository", () => {
   });
 
   test("notes a worktree as the last opened, to open again, though the list has its repository", async () => {
-    writeJson("palace.recentRepositories", []);
+    writeJson("recastle.recentRepositories", []);
     rememberRepository({ name: "palace-search", path: "/code/palace-search", worktrees: [worktree("palace", { main: true }), worktree("palace-search", { current: true })] });
     expect(recentRepositories()).toEqual([repo("palace")]);
     vi.mocked(invoke).mockResolvedValue(true);
@@ -62,7 +62,7 @@ describe("remembering a repository", () => {
 });
 
 describe("forgetting repositories that are gone", () => {
-  beforeEach(() => writeJson("palace.recentRepositories", [repo("palace"), repo("deleted"), repo("blog")]));
+  beforeEach(() => writeJson("recastle.recentRepositories", [repo("palace"), repo("deleted"), repo("blog")]));
 
   test("takes those whose folders are gone off the list", async () => {
     vi.mocked(invoke).mockResolvedValue(["/code/deleted"]);

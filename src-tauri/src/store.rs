@@ -15,7 +15,7 @@ use tauri::{AppHandle, Emitter, Manager};
 pub struct Store(Mutex<Option<bool>>);
 
 // Development builds keep their own, as their web view's storage is separate too.
-const FILE: &str = if cfg!(debug_assertions) { "saved-dev.json" } else { "saved.json" };
+pub(crate) const FILE: &str = if cfg!(debug_assertions) { "saved-dev.json" } else { "saved.json" };
 
 fn file(app: &AppHandle) -> Result<PathBuf, String> {
     let dir = app.path().app_data_dir().map_err(|e| format!("Couldn't find Palace's data folder: {e}"))?;
@@ -71,10 +71,17 @@ pub(crate) fn seconds_now() -> u64 {
     std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
 }
 
-/// The theme Palace's settings choose, "light", "dark" or "system", if it can tell.
+/// The theme the settings choose, "light", "dark" or "system", if it can tell.
 pub fn saved_theme(app: &AppHandle) -> Option<String> {
-    let all = read(&file(app).ok()?).ok()??;
-    all.get("palace.settings")?.get("theme")?.as_str().map(String::from)
+    theme_in(&read(&file(app).ok()?).ok()??)
+}
+
+/// The theme the settings in `all` choose. Read before the page, which takes Palace's
+/// settings as Recastle's (see fromPalace in storage.js), so as Recastle first starts,
+/// they may be only Palace's still.
+fn theme_in(all: &Map<String, Value>) -> Option<String> {
+    let settings = all.get("recastle.settings").or_else(|| all.get("palace.settings"))?;
+    settings.get("theme")?.as_str().map(String::from)
 }
 
 fn read(path: &Path) -> Result<Option<Map<String, Value>>, String> {
@@ -108,6 +115,14 @@ fn write(path: &Path, values: Map<String, Value>) -> Result<(), String> {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn the_theme_is_recastle_s_or_as_it_first_starts_palace_s() {
+        let theme = |all: Value| theme_in(all.as_object().unwrap());
+        assert_eq!(theme(json!({"recastle.settings": {"theme": "dark"}, "palace.settings": {"theme": "light"}})).as_deref(), Some("dark"));
+        assert_eq!(theme(json!({"palace.settings": {"theme": "light"}})).as_deref(), Some("light"));
+        assert_eq!(theme(json!({})), None);
+    }
 
     fn map(value: Value) -> Map<String, Value> {
         value.as_object().unwrap().clone()

@@ -83,7 +83,7 @@ beforeEach(() => {
     folders_gone: [],
     folder_exists: true,
     load_store: {
-      "palace.recentRepositories": [
+      "recastle.recentRepositories": [
         { name: "palace", path: PALACE },
         { name: "other", path: OTHER },
         { name: "third", path: THIRD },
@@ -687,7 +687,7 @@ test("a repository is the last opened as it's opened where it's seen, not as a t
   await start();
   await openInNewTab("other");
   const { readJson } = await import("./lib/storage.js");
-  const first = () => readJson("palace.recentRepositories", [])[0]?.path;
+  const first = () => readJson("recastle.recentRepositories", [])[0]?.path;
   expect(first()).toBe(OTHER);
   // palace's tab, behind, refreshes as its folder changes.
   send("repo-changed", { path: PALACE });

@@ -7,21 +7,21 @@ test("the program a command runs is its first word after any settings", () => {
   expect(programOf("")).toBe("");
 });
 
-test("each agent Palace knows starts on the task in $PALACE_TASK, its own way", () => {
-  expect(taskCommand("claude")).toBe('claude -- "$PALACE_TASK"');
-  expect(taskCommand("codex")).toBe('codex -- "$PALACE_TASK"');
+test("each agent Palace knows starts on the task in $RECASTLE_TASK, its own way", () => {
+  expect(taskCommand("claude")).toBe('claude -- "$RECASTLE_TASK"');
+  expect(taskCommand("codex")).toBe('codex -- "$RECASTLE_TASK"');
   // Gemini CLI stays open after it only with -i.
-  expect(taskCommand("gemini")).toBe('gemini -i "$PALACE_TASK"');
+  expect(taskCommand("gemini")).toBe('gemini -i "$RECASTLE_TASK"');
 });
 
 test("an agent command's own options stay, the task after them, not taken for one's value", () => {
-  expect(taskCommand("claude --add-dir ../lib ")).toBe('claude --add-dir ../lib -- "$PALACE_TASK"');
-  expect(taskCommand("ANTHROPIC_MODEL=x claude")).toBe('ANTHROPIC_MODEL=x claude -- "$PALACE_TASK"');
+  expect(taskCommand("claude --add-dir ../lib ")).toBe('claude --add-dir ../lib -- "$RECASTLE_TASK"');
+  expect(taskCommand("ANTHROPIC_MODEL=x claude")).toBe('ANTHROPIC_MODEL=x claude -- "$RECASTLE_TASK"');
 });
 
 test("an option that resumes one agent's session is another's own option", () => {
   // -c is Claude Code's --continue, but Codex's --config.
-  expect(taskCommand("codex -c model_reasoning_effort=high")).toBe('codex -c model_reasoning_effort=high -- "$PALACE_TASK"');
+  expect(taskCommand("codex -c model_reasoning_effort=high")).toBe('codex -c model_reasoning_effort=high -- "$RECASTLE_TASK"');
   expect(taskCommand("claude -c")).toBeNull();
 });
 

@@ -3,7 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { onSavedElsewhere, readJson, writeJson } from "./storage.js";
 
 // App-wide preferences, kept in local storage and applied to the page as they change.
-const KEY = "palace.settings";
+const KEY = "recastle.settings";
 
 const DEFAULTS = {
   // "system", "light" or "dark".
@@ -61,7 +61,7 @@ function apply() {
   root.dataset.theme = dark ? "dark" : "light";
   // For the next window to start with, before it's read the settings (see index.html).
   try {
-    localStorage.setItem("palace.theme", root.dataset.theme);
+    localStorage.setItem("recastle.theme", root.dataset.theme);
   } catch {
     // Without it, a new window starts light, then turns dark.
   }

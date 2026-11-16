@@ -123,8 +123,15 @@ fn checkout_pull_from(
     checkout_fork_pull(path, remote, number, replace)
 }
 
+/// Where the version each pull request was brought to is noted (see checkout_fork_pull):
+/// Recastle's, and Palace's, as it was before it became Recastle, which is read where
+/// Recastle has noted none, and goes once Recastle has. Read for at least a year after
+/// the rename (2026-11).
+const NOTED: &str = "refs/recastle/pull/";
+const PALACE_NOTED: &str = "refs/palace/pull/";
+
 /// Brings pr-N to the pull request's newest version, fetched to FETCH_HEAD, and checks
-/// it out. Each time, the version it's brought to is noted under refs/palace/pull/, out
+/// it out. Each time, the version it's brought to is noted under NOTED, out
 /// of sight of the branch list, so that when the pull request is rewritten, as when its
 /// author rebases and force-pushes, the commits on pr-N beyond that version are known
 /// to be the user's own. Without any, pr-N is replaced by the new version; with some,
@@ -134,7 +141,8 @@ fn checkout_fork_pull(path: &str, remote: &str, number: u64, replace: bool) -> R
     let repo = Repository::discover(path).map_err(message)?;
     let tip = repo.revparse_single("FETCH_HEAD").and_then(|o| o.peel_to_commit()).map_err(message)?.id();
     let local = format!("pr-{number}");
-    let noted = format!("refs/palace/pull/{remote}/{number}");
+    let noted = format!("{NOTED}{remote}/{number}");
+    let noted_by_palace = format!("{PALACE_NOTED}{remote}/{number}");
     let current = repo.head().ok().and_then(|h| h.shorthand().ok().map(str::to_string));
     let checked_out = current.as_deref() == Some(local.as_str());
     let tip_hex = tip.to_string();
@@ -162,7 +170,7 @@ fn checkout_fork_pull(path: &str, remote: &str, number: u64, replace: bool) -> R
         }
         // Rewritten.
         Some(mine) => {
-            let own = match repo.refname_to_id(&noted) {
+            let own = match repo.refname_to_id(&noted).or_else(|_| repo.refname_to_id(&noted_by_palace)) {
                 Ok(before) => Some(commits_beyond(&repo, mine, before).map_err(message)?),
                 Err(_) => None,
             };
@@ -178,7 +186,10 @@ fn checkout_fork_pull(path: &str, remote: &str, number: u64, replace: bool) -> R
             format!("Pull request #{number} was rewritten; {local} now matches it.")
         }
     };
-    repo.reference(&noted, tip, true, "Palace: pull request checked out").map_err(message)?;
+    repo.reference(&noted, tip, true, "Recastle: pull request checked out").map_err(message)?;
+    if let Ok(mut old) = repo.find_reference(&noted_by_palace) {
+        let _ = old.delete();
+    }
     Ok(done)
 }
 
@@ -703,6 +714,28 @@ mod tests {
         let kept = t.repo.find_branch("pr-7", git2::BranchType::Local).unwrap().get().target();
         assert_eq!(kept, Some(mine));
         assert_eq!(std::fs::read_to_string(t.dir.join("a.txt")).unwrap(), "edited\n");
+    }
+
+    #[test]
+    fn a_rewritten_pull_request_palace_checked_out_is_known_by_what_palace_noted() {
+        let server = TempRepo::bare("palace-noted-pull-server");
+        let t = TempRepo::clone_of("palace-noted-pull", &server);
+        t.commit(&[("a.txt", Some("1\n"))], "First");
+        let main = t.branch();
+        crate::cli::git(t.path(), &["push", "-q", "origin", &main], None).unwrap();
+        // pr-7 as Palace checked it out, noting its version under its own name.
+        let first = rewrite_pull(&t, &main, &[("pr.txt", Some("one\n"))]);
+        crate::cli::git(t.path(), &["switch", "-qc", "pr-7", &first.to_string()], None).unwrap();
+        t.repo.reference("refs/palace/pull/origin/7", first, true, "Palace: pull request checked out").unwrap();
+        // Rewritten, with nothing of the user's on pr-7: replaced, as Recastle knows what
+        // Palace noted.
+        let second = rewrite_pull(&t, &main, &[("pr.txt", Some("two\n"))]);
+        let run = |replace| checkout_pull_from(t.path(), "origin", 7, None, replace, &Running::default(), &mut |_| {});
+        assert_eq!(run(false).unwrap(), "Pull request #7 was rewritten; pr-7 now matches it.");
+        assert_eq!(t.head(), second);
+        // Noted under Recastle's name now, Palace's gone.
+        assert_eq!(t.repo.refname_to_id("refs/recastle/pull/origin/7").unwrap(), second);
+        assert!(t.repo.find_reference("refs/palace/pull/origin/7").is_err());
     }
 
     #[test]

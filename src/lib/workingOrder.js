@@ -4,7 +4,7 @@ import { readJson } from "./storage.js";
 // going on to the next conflicted file does, to match what's seen.
 
 // Whether Working Copy shows its files as a tree, rather than a list (its View menu).
-export const TREE_KEY = "palace.workingCopyTree";
+export const TREE_KEY = "recastle.workingCopyTree";
 export const listsAsTree = () => readJson(TREE_KEY, false) === true;
 
 /**

@@ -40,7 +40,7 @@ test("each repository keeps its own pane sizes, one without starting at those la
   await nextTick();
   expect(a.sizes.history).toBe(400);
   // Those last set are kept for Palace's next start too.
-  expect(saved.get("palace.paneWidths")).toEqual({ sidebar: 260, history: 400, terminal: 420 });
+  expect(saved.get("recastle.paneWidths")).toEqual({ sidebar: 260, history: 400, terminal: 420 });
 });
 
 test("the terminal panel no taller than there's room for, as the window's height, or the tabs' row, leaves", async () => {
@@ -62,7 +62,7 @@ test("keeps only so many, the least recently set going first", () => {
     tab.repository.value = `/r${i}`;
     tab.save();
   }
-  const all = saved.get("palace.paneSizes");
+  const all = saved.get("recastle.paneSizes");
   expect(Object.keys(all)).toHaveLength(200);
   expect(all).not.toHaveProperty("/r0");
   expect(all).toHaveProperty("/r200");

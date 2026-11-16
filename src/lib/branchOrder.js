@@ -13,7 +13,7 @@ import { buildTree, flattenTree } from "./tree.js";
 // doesn't mention, such as new ones, follow the arranged ones in the usual order, and
 // keys of deleted branches are ignored. Dividers only go between top-level rows, and
 // may have a label.
-const KEY = "palace.branchOrder";
+const KEY = "recastle.branchOrder";
 const stored = readJson(KEY, {});
 const arrangements = reactive(stored && typeof stored === "object" ? stored : {});
 // What another window arranged, as for one of the repository's worktrees, shows here too,

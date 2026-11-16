@@ -14,6 +14,22 @@ let saving = Promise.resolve();
  */
 export let storeProblem = "";
 
+/**
+ * What Palace saved, under the names it had, `palace.` and then the rest, as Recastle's
+ * own, `recastle.` and the same: of `values`, those it saved that have none of
+ * Recastle's yet, to be kept as Recastle's. Palace's stay as they were. It goes by what's
+ * there, so it's the same for someone coming from any version of Palace (see
+ * migrate.rs, which brings the file itself over). Kept for at least a year after the
+ * rename (2026-11).
+ */
+export function fromPalace(values) {
+  return Object.fromEntries(
+    Object.entries(values)
+      .filter(([key]) => key.startsWith("palace.") && !(`recastle.${key.slice("palace.".length)}` in values))
+      .map(([key, value]) => [`recastle.${key.slice("palace.".length)}`, value]),
+  );
+}
+
 // Before 0.11.3, these were kept in the web view's storage.
 function fromWebView() {
   const found = {};
@@ -39,10 +55,12 @@ export async function loadStore() {
   } catch (e) {
     storeProblem = String(e);
     values = fromWebView();
+    Object.assign(values, fromPalace(values));
     return;
   }
   // Keys are never removed, so one the file doesn't have yet was never copied over.
   const missing = Object.fromEntries(Object.entries(fromWebView()).filter(([key]) => !(key in values)));
+  Object.assign(missing, fromPalace({ ...values, ...missing }));
   if (Object.keys(missing).length) {
     Object.assign(values, missing);
     save(missing);

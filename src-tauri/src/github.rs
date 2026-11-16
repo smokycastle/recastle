@@ -11,8 +11,10 @@ use std::io::{BufRead, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-const KEYRING_SERVICE: &str = "Palace";
+const KEYRING_SERVICE: &str = "Recastle";
 const KEYRING_ENTRY: &str = "github.com";
+/// Where Palace kept it, before it became Recastle (see bring_over_palace_sign_in).
+const PALACE_KEYRING_SERVICE: &str = "Palace";
 
 /// Whether a token is stored, so running git doesn't mean asking the keyring each time.
 static SIGNED_IN: AtomicBool = AtomicBool::new(false);
@@ -35,6 +37,50 @@ pub struct Account {
 /// Checks the keyring once at startup.
 pub fn load() {
     SIGNED_IN.store(saved().is_some(), Ordering::Relaxed);
+}
+
+/// Palace's sign-in, as Recastle's, where Recastle has none: copied, then Palace's
+/// removed. Asked for once, as Recastle first brings over what Palace saved (see
+/// migrate.rs): the item is Palace's, so macOS may ask whether Recastle may read it, and
+/// a no isn't asked again at every start. Not to be had, the user signs in again.
+pub fn bring_over_palace_sign_in() {
+    let (Ok(palace), Ok(recastle)) = (keyring::Entry::new(PALACE_KEYRING_SERVICE, KEYRING_ENTRY), entry()) else { return };
+    if take_over(&palace, &recastle) {
+        load();
+    }
+}
+
+/// What a sign-in's kept in: the keyring, or in tests, something standing in for it.
+trait Kept {
+    fn read(&self) -> Option<String>;
+    fn write(&self, json: &str) -> bool;
+    fn remove(&self);
+}
+
+impl Kept for keyring::Entry {
+    fn read(&self) -> Option<String> {
+        self.get_password().ok()
+    }
+    fn write(&self, json: &str) -> bool {
+        self.set_password(json).is_ok()
+    }
+    fn remove(&self) {
+        let _ = self.delete_credential();
+    }
+}
+
+/// Copies the sign-in in `from` to `to`, where `to` has none, and it's one: then it's
+/// removed from `from`. Says whether it was copied.
+fn take_over(from: &impl Kept, to: &impl Kept) -> bool {
+    if to.read().is_some() {
+        return false;
+    }
+    let Some(json) = from.read().filter(|json| serde_json::from_str::<Saved>(json).is_ok()) else { return false };
+    if !to.write(&json) {
+        return false;
+    }
+    from.remove();
+    true
 }
 
 /// The signed-in account, if any. Read from the keyring, so it works offline.
@@ -524,6 +570,41 @@ fn check_token(token: &str) -> Result<Account, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A keyring item in memory.
+    #[derive(Default)]
+    struct Item(std::cell::RefCell<Option<String>>);
+
+    impl Kept for Item {
+        fn read(&self) -> Option<String> {
+            self.0.borrow().clone()
+        }
+        fn write(&self, json: &str) -> bool {
+            *self.0.borrow_mut() = Some(json.into());
+            true
+        }
+        fn remove(&self) {
+            *self.0.borrow_mut() = None;
+        }
+    }
+
+    const SIGN_IN: &str = r#"{"token":"t","login":"ada","name":null,"avatar_url":"u"}"#;
+
+    #[test]
+    fn palace_s_sign_in_is_taken_over_where_recastle_has_none() {
+        let (palace, recastle) = (Item(Some(SIGN_IN.into()).into()), Item::default());
+        assert!(take_over(&palace, &recastle));
+        assert_eq!(recastle.read().as_deref(), Some(SIGN_IN));
+        assert_eq!(palace.read(), None);
+
+        // Recastle's own isn't replaced; nor is what isn't a sign-in taken.
+        let (palace, recastle) = (Item(Some(SIGN_IN.into()).into()), Item(Some("mine".into()).into()));
+        assert!(!take_over(&palace, &recastle));
+        assert_eq!(recastle.read().as_deref(), Some("mine"));
+        let (palace, recastle) = (Item(Some("not json".into()).into()), Item::default());
+        assert!(!take_over(&palace, &recastle));
+        assert_eq!((palace.read().as_deref(), recastle.read()), (Some("not json"), None));
+    }
 
     fn saved() -> Saved {
         Saved {

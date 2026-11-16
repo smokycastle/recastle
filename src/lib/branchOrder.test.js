@@ -17,15 +17,15 @@ const { readJson } = await import("./storage.js");
 const savedElsewhere = (values) => heard.storeChanged({ payload: { window: "window-2", values } });
 
 // Each test starts with nothing arranged, as another window saving that would leave it.
-beforeEach(() => savedElsewhere({ "palace.branchOrder": {} }));
+beforeEach(() => savedElsewhere({ "recastle.branchOrder": {} }));
 
 describe("the branches' arrangement", () => {
   test("takes in what another window arranged, and doesn't save over it", () => {
     const arranged = { "/code/blog": { order: ["branch-divider:x", "branch:main"], labels: { "branch-divider:x": "Theirs" } } };
-    savedElsewhere({ "palace.branchOrder": arranged });
+    savedElsewhere({ "recastle.branchOrder": arranged });
     expect(dividerRows("/code/blog")).toEqual([{ key: "branch-divider:x", divider: true, label: "Theirs" }]);
 
     moveKey("/code/other", "branch:b", "branch:a", false, ["branch:a", "branch:b"]);
-    expect(readJson("palace.branchOrder", {})["/code/blog"]).toEqual(arranged["/code/blog"]);
+    expect(readJson("recastle.branchOrder", {})["/code/blog"]).toEqual(arranged["/code/blog"]);
   });
 });

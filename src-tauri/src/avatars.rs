@@ -26,6 +26,9 @@ const LOOKUPS: usize = 40;
 /// How long to wait before asking again about someone who had no GitHub account.
 const RETRY_MISSES: u64 = 7 * 24 * 60 * 60;
 
+/// The file in the app's cache folder where what's known about each author is kept.
+pub(crate) const CACHE_FILE: &str = "avatars.json";
+
 /// What's known about each author, by lowercased email address.
 #[derive(Default)]
 pub struct AvatarCache(Mutex<Option<HashMap<String, Entry>>>);
@@ -56,7 +59,7 @@ pub fn github_avatars(app: AppHandle, path: String) -> Result<(), String> {
 
     std::thread::spawn(move || {
         let state = app.state::<AvatarCache>();
-        let cache_file = app.path().app_cache_dir().ok().map(|dir| dir.join("avatars.json"));
+        let cache_file = app.path().app_cache_dir().ok().map(|dir| dir.join(CACHE_FILE));
         let report = |avatars: &HashMap<String, String>| {
             let _ = app.emit("avatars", Found { path: path.clone(), avatars: avatars.clone() });
         };

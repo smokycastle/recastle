@@ -30,8 +30,8 @@ const METHODS = {
   rebase: { label: "Rebase and Merge", button: "Rebase and Merge", detail: "The commits are added to the base branch one by one, without a merge commit." },
 };
 // The way chosen last, offered first next time.
-const METHOD_KEY = "palace.mergeMethod";
-const DELETE_KEY = "palace.deleteMergedBranch";
+const METHOD_KEY = "recastle.mergeMethod";
+const DELETE_KEY = "recastle.deleteMergedBranch";
 
 const state = shallowRef(null);
 const error = ref("");

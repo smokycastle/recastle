@@ -155,7 +155,7 @@ const fileFilter = ref(null);
 
 // Whether the history shows only the mainline, each merge standing for the commits it
 // brought in, as `git log --first-parent` does. Remembered for each repository.
-const FIRST_PARENT_KEY = "palace.firstParent";
+const FIRST_PARENT_KEY = "recastle.firstParent";
 const firstParent = ref(false);
 watch(
   () => overview.value?.path,

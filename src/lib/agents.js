@@ -7,7 +7,7 @@ import { keepInSync, readJson, writeJson } from "./storage.js";
 // The command an agent tab runs, for each repository that doesn't use the default:
 // Claude Code, or another agent that runs in a terminal, such as Codex or Gemini.
 // (Kept under its old name, from when only Claude was meant.)
-const AGENT_COMMANDS_KEY = "palace.claudeCommands";
+const AGENT_COMMANDS_KEY = "recastle.claudeCommands";
 export const DEFAULT_AGENT_COMMAND = "claude";
 
 const agentCommands = reactive(readJson(AGENT_COMMANDS_KEY, {}));
@@ -70,7 +70,7 @@ const SHELL_SYNTAX = /[;&|#<>`]|\$\(/;
 
 /**
  * The agent `command`, as the repository's agent command, run to start on the task in
- * $PALACE_TASK, for New Agent Task (see terminal_open): given on its command line rather than
+ * $RECASTLE_TASK, for New Agent Task (see terminal_open): given on its command line rather than
  * typed into it, so it waits through whatever the agent asks first, such as whether to
  * trust the new worktree's folder. The task itself isn't on the command line, where the
  * shell would read it, only the variable, which it passes on as it is. Null for a command
@@ -82,7 +82,7 @@ export function taskCommand(command) {
   const agent = AGENTS.find((a) => a.program === programOf(command));
   if (!agent?.taskArgs || SHELL_SYNTAX.test(command)) return null;
   if (command.trim().split(/\s+/).some((word) => agent.resumes?.includes(word))) return null;
-  return `${command.trim()} ${agent.taskArgs} "$PALACE_TASK"`;
+  return `${command.trim()} ${agent.taskArgs} "$RECASTLE_TASK"`;
 }
 
 /** The agent Palace offers by that name, such as "Codex", if it's one. */

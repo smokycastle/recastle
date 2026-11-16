@@ -14,7 +14,7 @@ import { readJson, writeJson } from "./storage.js";
 // The issues are origin's repository's (or the first GitHub remote's), unless that's
 // a fork: then they're the parent's, where a project's issues usually are. Choosing
 // another in the menu is remembered for the repository.
-const ISSUE_REPOS_KEY = "palace.issueRepos";
+const ISSUE_REPOS_KEY = "recastle.issueRepos";
 
 /**
  * overview: the repository overview ref. isIssues and isPulls: whether the Issues or

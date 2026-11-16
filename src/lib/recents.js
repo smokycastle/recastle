@@ -6,9 +6,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { folderName } from "./format.js";
 import { readJson, writeJson } from "./storage.js";
 
-export const RECENTS_KEY = "palace.recentRepositories";
+export const RECENTS_KEY = "recastle.recentRepositories";
 // The folder last opened, a worktree's own, which the list has as its repository.
-const LAST_KEY = "palace.lastRepository";
+const LAST_KEY = "recastle.lastRepository";
 const MAX_RECENTS = 30;
 // A list of more recent repositories than this, on the welcome screen or in the
 // sidebar's menu, has a field to find one in, and shows this many at a time.

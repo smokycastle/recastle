@@ -160,7 +160,7 @@ describe("counts", () => {
 
 describe("new issues", () => {
   test("are those opened since the Issues view was last looked at, until it's looked at again", async () => {
-    stored.set("palace.issuesSeen", { "me/app": "2026-03-01T00:00:00Z" });
+    stored.set("recastle.issuesSeen", { "me/app": "2026-03-01T00:00:00Z" });
     github["me/app"].issues = [{ created_at: "2026-02-01T00:00:00Z" }, { created_at: "2026-04-01T00:00:00Z" }];
     const { result } = setUp();
     await settle();
@@ -170,7 +170,7 @@ describe("new issues", () => {
     await nextTick();
     expect(result.freshIssues.value).toBe(0);
     expect(result.issuesSeenBefore.value).toBe("2026-03-01T00:00:00Z");
-    expect(stored.get("palace.issuesSeen")["me/app"]).not.toBe("2026-03-01T00:00:00Z");
+    expect(stored.get("recastle.issuesSeen")["me/app"]).not.toBe("2026-03-01T00:00:00Z");
   });
 
   test("start from the first check, before which nothing is new", async () => {
@@ -178,7 +178,7 @@ describe("new issues", () => {
     const { result } = setUp();
     await settle();
     expect(result.freshIssues.value).toBe(0);
-    expect(stored.get("palace.issuesSeen")["me/app"]).toBeTruthy();
+    expect(stored.get("recastle.issuesSeen")["me/app"]).toBeTruthy();
   });
 });
 

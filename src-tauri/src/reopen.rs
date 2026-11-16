@@ -17,7 +17,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 
 // Development builds keep their own, as they do their saved data (see store.rs).
-const FILE: &str = if cfg!(debug_assertions) { "reopen-dev.json" } else { "reopen.json" };
+pub(crate) const FILE: &str = if cfg!(debug_assertions) { "reopen-dev.json" } else { "reopen.json" };
 
 /// Why the windows are noted.
 #[derive(Clone, Copy, PartialEq)]

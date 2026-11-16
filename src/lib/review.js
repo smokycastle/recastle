@@ -10,7 +10,7 @@ import { keepInSync, readJson, writeJson } from "./storage.js";
 // lines it's on, as the diff had them ({ kind, old, new, text }), which place it again
 // as the diff changes.
 
-const KEY = "palace.reviewComments";
+const KEY = "recastle.reviewComments";
 
 // Repository path -> its comments, oldest first.
 export const reviews = reactive(withoutSent(readJson(KEY, {})));

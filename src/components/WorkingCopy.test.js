@@ -174,12 +174,12 @@ describe("the changed files", () => {
 });
 
 describe("in the tree, the arrow keys", () => {
-  afterEach(() => writeJson("palace.workingCopyTree", false));
+  afterEach(() => writeJson("recastle.workingCopyTree", false));
 
   // What goes by the files in the order they're listed, as going on to the next
   // conflicted file does, takes it from listedOrder: it's the order the tree draws.
   test("go through the files in the order listedOrder gives", async () => {
-    writeJson("palace.workingCopyTree", true);
+    writeJson("recastle.workingCopyTree", true);
     const { statusFiles } = show();
     // As git gives them: by path, capitals first.
     const files = ["README.md", "Z.txt", "docs/Guide.md", "src/b.js", "src/lib/a.js", "src/a.js"].map((path) => file(path));
@@ -195,7 +195,7 @@ describe("in the tree, the arrow keys", () => {
   });
 
   test("go through folders and files, open and close folders, and go up to the one a file's in", async () => {
-    writeJson("palace.workingCopyTree", true);
+    writeJson("recastle.workingCopyTree", true);
     const { statusFiles } = show();
     statusFiles.value = [file("src/a.js"), file("src/b.js"), file("z.txt")];
     await settle();

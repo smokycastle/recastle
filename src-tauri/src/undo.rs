@@ -94,8 +94,11 @@ pub async fn restore_snapshot(path: String, from: Snapshot, to: Snapshot, mode: 
 /// Where commits and tags something deleted are kept for undoing it: deleting a
 /// branch deletes its reflog too, and dropping a stash its entry in the stash's, so
 /// what only they had is unreachable, and git's routine cleanup may remove it for
-/// good. These refs keep it while Palace runs; the next run lets them go.
-const KEPT: &str = "refs/palace/kept/";
+/// good. These refs keep it while Recastle runs; the next run lets them go, and those
+/// Palace kept, as it was before it became Recastle (for at least a year after the
+/// rename, 2026-11).
+const KEPT: &str = "refs/recastle/kept/";
+const PALACE_KEPT: &str = "refs/palace/kept/";
 
 /// Keeps what `name` (a full ref name, or "stash@{n}") points at for undo, before it's
 /// deleted.
@@ -103,7 +106,7 @@ pub(crate) fn keep(path: &str, name: &str) {
     let Ok(repo) = Repository::discover(path) else { return };
     let Ok(object) = repo.revparse_single(name) else { return };
     let id = object.id();
-    let _ = repo.reference(&format!("{KEPT}{id}"), id, true, "Kept by Palace for undo");
+    let _ = repo.reference(&format!("{KEPT}{id}"), id, true, "Kept by Recastle for undo");
 }
 
 /// Removes the refs a previous run kept, once per run for each repository.
@@ -112,9 +115,11 @@ fn release_kept(repo: &Repository) {
     if !RELEASED.lock().unwrap().insert(repo.path().to_path_buf()) {
         return;
     }
-    if let Ok(refs) = repo.references_glob(&format!("{KEPT}*")) {
-        for mut reference in refs.flatten() {
-            let _ = reference.delete();
+    for kept in [KEPT, PALACE_KEPT] {
+        if let Ok(refs) = repo.references_glob(&format!("{kept}*")) {
+            for mut reference in refs.flatten() {
+                let _ = reference.delete();
+            }
         }
     }
 }
@@ -934,6 +939,17 @@ mod tests {
         undo(&t, &step, "keep").unwrap();
         assert_eq!(t.repo.refname_to_id("refs/heads/gone").unwrap(), only_here);
         assert!(!step.0.refs.contains_key(&kept), "snapshots leave them out");
+    }
+
+    #[test]
+    fn what_palace_kept_for_undo_goes_with_recastle_s_on_the_next_run() {
+        let t = TempRepo::new("undo-palace-kept");
+        let first = t.commit(&[("a.txt", Some("a\n"))], "First");
+        t.repo.reference(&format!("{PALACE_KEPT}{first}"), first, true, "Kept by Palace for undo").unwrap();
+        t.repo.reference(&format!("{KEPT}{first}"), first, true, "Kept by Recastle for undo").unwrap();
+        release_kept(&t.repo);
+        assert!(t.repo.find_reference(&format!("{PALACE_KEPT}{first}")).is_err());
+        assert!(t.repo.find_reference(&format!("{KEPT}{first}")).is_err());
     }
 
     #[test]

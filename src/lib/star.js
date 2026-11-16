@@ -11,8 +11,8 @@ import { readJson, writeJson } from "./storage.js";
 // link for anyone who'd rather do it later.
 export const PALACE_URL = "https://github.com/smokycastle/recastle";
 
-const ASKED_KEY = "palace.starAsked";
-const FIRST_STARTED_KEY = "palace.firstStarted";
+const ASKED_KEY = "recastle.starAsked";
+const FIRST_STARTED_KEY = "recastle.firstStarted";
 const DELAY = 10 * 1000;
 const IN_USE_FOR = 24 * 60 * 60 * 1000;
 

@@ -33,8 +33,10 @@ static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 /// would tell programs in its terminals they're in that one: Claude Code, say, takes
 /// itself to be in RustRover's terminal, connected to it, and reads keys as there.
 const INHERITED: &[&str] = &[
-    // A task for an agent in one of Palace's own terminals (see terminal_open), when
-    // Palace is started from there, as in development: not for every terminal of this one.
+    // A task for an agent in one of Recastle's own terminals (see terminal_open), when
+    // Recastle is started from there, as in development: not for every terminal of this
+    // one. Or Palace's, as Recastle was.
+    "RECASTLE_TASK",
     "PALACE_TASK",
     "TERMINAL_EMULATOR",
     "ENABLE_IDE_INTEGRATION",
@@ -66,9 +68,10 @@ fn size(cols: u16, rows: u16) -> PtySize {
 
 /// Starts the user's login shell in `path`, `cols` by `rows`, and returns its id.
 /// `output` receives what it prints, and `exited` its exit code once it's gone. With
-/// `task`, as for New Agent Task, the shell has it as $PALACE_TASK, for the agent's command
-/// to give the agent: in the environment, it reaches the agent as it is, whatever it
-/// says, where typed on the command line, the shell would read it.
+/// `task`, as for New Agent Task, the shell has it as $RECASTLE_TASK, for the agent's
+/// command to give the agent: in the environment, it reaches the agent as it is,
+/// whatever it says, where typed on the command line, the shell would read it. And as
+/// $PALACE_TASK, its name before Palace became Recastle, for anything made to read that.
 #[tauri::command]
 pub async fn terminal_open(
     window: WebviewWindow,
@@ -121,6 +124,7 @@ fn open(
     // After what's inherited is let go, which includes a task of the terminal Palace
     // was started from.
     if let Some(task) = task {
+        command.env("RECASTLE_TASK", &task);
         command.env("PALACE_TASK", task);
     }
 
@@ -609,10 +613,13 @@ mod tests {
         });
         let exited = Channel::new(|_| Ok(()));
         let id = open("test".into(), dir.to_string_lossy().into_owned(), 200, 24, output, exited, Some(task.into())).unwrap();
-        tauri::async_runtime::block_on(terminal_write(id, "printf '<%s>' \"$PALACE_TASK\"\n".into())).unwrap();
+        // And by its old name, the same: said as "same", which the command, as the terminal
+        // shows it typed, doesn't have in one piece.
+        let both = "printf '<%s>' \"$RECASTLE_TASK\"; [ \"$PALACE_TASK\" = \"$RECASTLE_TASK\" ] && printf '%s' sa me\n";
+        tauri::async_runtime::block_on(terminal_write(id, both.into())).unwrap();
         let mut seen = String::new();
         let started = std::time::Instant::now();
-        while !seen.contains(">") || !seen.contains(&format!("<{}>", task.replace('\n', "\r\n"))) {
+        while !seen.contains("same") || !seen.contains(&format!("<{}>", task.replace('\n', "\r\n"))) {
             if started.elapsed() > Duration::from_secs(10) {
                 break;
             }
@@ -623,6 +630,7 @@ mod tests {
         tauri::async_runtime::block_on(terminal_close(id));
         // The terminal shows a line break as CR LF.
         assert!(seen.contains(&format!("<{}>", task.replace('\n', "\r\n"))), "printed: {seen:?}");
+        assert!(seen.contains("same"), "printed: {seen:?}");
         assert!(!dir.join("pwned").exists());
         std::fs::remove_dir_all(&dir).unwrap();
     }

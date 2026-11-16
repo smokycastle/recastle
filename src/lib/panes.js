@@ -8,13 +8,13 @@ import { readJson, writeJson } from "./storage.js";
 // any, kept for a repository that's had none of its own; and with Settings › Appearance
 // saying not to keep each repository's, every tab's.
 
-const KEY = "palace.paneWidths";
+const KEY = "recastle.paneWidths";
 
 export const panes = reactive({ sidebar: 300, history: 580, terminal: 300, ...readJson(KEY, {}) });
 
 // Each repository's sizes, by path, { sidebar, history, terminal }, the most recently
 // set last; no more are kept than this, the least recently set going first.
-const SIZES_KEY = "palace.paneSizes";
+const SIZES_KEY = "recastle.paneSizes";
 const MOST_KEPT = 200;
 
 // How tall the row of tabs across the window's top is, if there is one (see styles.css).

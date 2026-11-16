@@ -22,9 +22,9 @@ import {
 } from "./branchOrder.js";
 
 // The Pull dialog's last choices, offered again next time.
-const PULL_CHOICES_KEY = "palace.pullChoices";
+const PULL_CHOICES_KEY = "recastle.pullChoices";
 // Whether the New Branch dialog last published the branch, offered again next time.
-const PUBLISH_KEY = "palace.publishNewBranches";
+const PUBLISH_KEY = "recastle.publishNewBranches";
 
 // Branch, merge, rebase and stash actions, and the context menus that offer them.
 // `run(titles, command, args, options)` performs a backend command with progress and

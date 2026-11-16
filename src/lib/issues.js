@@ -52,7 +52,7 @@ export function splitIssueRefs(text) {
 }
 
 // When each repository's issues were last looked at, so newer ones can be marked new.
-const SEEN_KEY = "palace.issuesSeen";
+const SEEN_KEY = "recastle.issuesSeen";
 
 /** When the repository's issues were last looked at (an ISO time), or null if never. */
 export function issuesSeenAt({ owner, repo }) {
