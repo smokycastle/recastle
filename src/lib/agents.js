@@ -21,7 +21,7 @@ export function setAgentCommand(path, command) {
   writeJson(AGENT_COMMANDS_KEY, { ...agentCommands });
 }
 
-// The agents Palace offers by name, in the terminal panel's ⋯ menu: Claude Code first,
+// The agents Recastle offers by name, in the terminal panel's ⋯ menu: Claude Code first,
 // the default. Each says how to install it, what Shift+Enter types in its prompt to
 // start a new line rather than send (Esc then Enter for Claude Code, and Ctrl+J for
 // Codex and Gemini CLI), and what its command line takes to start on a task, staying
@@ -74,7 +74,7 @@ const SHELL_SYNTAX = /[;&|#<>`]|\$\(/;
  * typed into it, so it waits through whatever the agent asks first, such as whether to
  * trust the new worktree's folder. The task itself isn't on the command line, where the
  * shell would read it, only the variable, which it passes on as it is. Null for a command
- * whose agent Palace doesn't know how to give one to, that resumes a session (each
+ * whose agent Recastle doesn't know how to give one to, that resumes a session (each
  * agent's `resumes`, after which a task would be taken for the session's name), or
  * that's more than one command, where the task could go to another.
  */
@@ -85,7 +85,7 @@ export function taskCommand(command) {
   return `${command.trim()} ${agent.taskArgs} "$RECASTLE_TASK"`;
 }
 
-/** The agent Palace offers by that name, such as "Codex", if it's one. */
+/** The agent Recastle offers by that name, such as "Codex", if it's one. */
 export const agentNamed = (name) => AGENTS.find((agent) => agent.name === name) ?? null;
 
 // What the agents people run in terminals are called, by their programs' names.
@@ -139,7 +139,7 @@ const LAUNCHERS = new Set(["cd", "env", "exec", "npx", "bunx", "pnpx", "uvx", "n
 
 /**
  * What to call an agent tab running `command`: the agent's name, where it's one
- * Palace knows, as in "npx @openai/codex" or "cd api && claude", or else the
+ * Recastle knows, as in "npx @openai/codex" or "cd api && claude", or else the
  * program's, capitalized.
  */
 export function agentName(command) {

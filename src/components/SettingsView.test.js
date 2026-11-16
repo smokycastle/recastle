@@ -5,7 +5,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import SettingsView from "./SettingsView.vue";
 
 vi.mock("@tauri-apps/api/core", () => ({
-  invoke: vi.fn(async (command) => (command === "about_palace" ? { copyright: "Copyright © 2026 Tim McLeod", license: "MIT" } : null)),
+  invoke: vi.fn(async (command) => (command === "about_recastle" ? { copyright: "Copyright © 2026 Tim McLeod", license: "MIT" } : null)),
 }));
 vi.mock("@tauri-apps/plugin-opener", () => ({ openUrl: vi.fn() }));
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => () => {}) }));
@@ -42,15 +42,15 @@ test("on its own, with no repository, sets only the name and email for every one
 });
 
 test("in a repository, it can set one for that repository alone, and has no way back", async () => {
-  mount({ path: "/code/palace", name: "palace" });
+  mount({ path: "/code/recastle", name: "recastle" });
   await nextTick();
-  expect(document.body.textContent).toContain("For palace only");
+  expect(document.body.textContent).toContain("For recastle only");
   expect(document.querySelectorAll(".identity")).toHaveLength(2);
   expect([...document.querySelectorAll("button")].some((b) => b.textContent.trim() === "Back")).toBe(false);
 });
 
 test("scrolls back to the top, its About page", async () => {
-  const { view } = mount({ path: "/code/palace", name: "palace" });
+  const { view } = mount({ path: "/code/recastle", name: "recastle" });
   await nextTick();
   const scroller = document.querySelector(".settings");
   scroller.scrollTo = vi.fn();
@@ -59,7 +59,7 @@ test("scrolls back to the top, its About page", async () => {
 });
 
 test("ends with the copyright and license, as the system's About panel had them", async () => {
-  mount({ path: "/code/palace", name: "palace" });
+  mount({ path: "/code/recastle", name: "recastle" });
   await nextTick();
   await nextTick();
   const colophon = document.querySelector(".colophon");

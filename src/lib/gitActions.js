@@ -192,7 +192,7 @@ export function useGitActions({
       title: "Rename Remote Branch",
       message: github
         ? `Rename “${old}” on ${github.owner}/${github.repo}. GitHub moves its open pull requests to the new name.`
-        : `Rename “${old}” on ${remote.name}. Palace pushes it under the new name, then deletes the old one, so any open pull requests for it there may close.`,
+        : `Rename “${old}” on ${remote.name}. Recastle pushes it under the new name, then deletes the old one, so any open pull requests for it there may close.`,
       fields: [{ key: "name", label: "New name", type: "text", value: old }],
       confirmLabel: "Rename",
     });
@@ -207,7 +207,7 @@ export function useGitActions({
     if (github) {
       const here = stillHere();
       error = await run(titles, "github_rename_branch", { owner: github.owner, repo: github.repo, branch: old, newName: to });
-      // GitHub finishes renaming in the background; Palace waits for it, then fetches,
+      // GitHub finishes renaming in the background; Recastle waits for it, then fetches,
       // in the repository it was renamed from.
       if (!error && !here()) return;
       error ??= await run(titles, "finish_remote_rename", { remote: remote.name, old, new: to });
@@ -314,7 +314,7 @@ export function useGitActions({
     const branch = headBranchInfo();
     const target = branch?.upstream ?? "its remote";
     const ok = await confirm(
-      `Force push “${current()}” to ${target}?\n\nThis replaces the remote branch with your version, discarding the commits there that you've rewritten. If someone else has pushed commits you haven't pulled, Palace stops instead of overwriting them.`,
+      `Force push “${current()}” to ${target}?\n\nThis replaces the remote branch with your version, discarding the commits there that you've rewritten. If someone else has pushed commits you haven't pulled, Recastle stops instead of overwriting them.`,
       "Force Push",
       "Force Push",
     );
@@ -633,7 +633,7 @@ export function useGitActions({
   const worktrees = () => overview.value?.worktrees ?? [];
   const worktreeOf = (branch) => overview.value?.branches.find((b) => b.name === branch)?.worktree ?? null;
   // A new worktree's folder is named after the repository and the branch, as
-  // "palace-feature-login", and goes beside the repository's own unless another place
+  // "recastle-feature-login", and goes beside the repository's own unless another place
   // is chosen.
   const mainFolder = () => repositoryFolder(overview.value);
   const worktreeName = (branch) => `${folderName(mainFolder())}-${branch.replace(/[/\\\s]+/g, "-")}`;
@@ -953,7 +953,7 @@ export function useGitActions({
 
   async function removeRemote(name) {
     const ok = await confirm(
-      `Remove the remote “${name}”?\n\nIts branches disappear from Palace. Nothing changes on the server, and your local branches stay, though any that track one of its branches lose their upstream.`,
+      `Remove the remote “${name}”?\n\nIts branches disappear from Recastle. Nothing changes on the server, and your local branches stay, though any that track one of its branches lose their upstream.`,
       "Remove Remote",
       "Remove",
     );

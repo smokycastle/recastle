@@ -5,7 +5,7 @@ import WorkingFileDiff from "./WorkingFileDiff.vue";
 import { settings } from "../lib/settings.js";
 
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
-// storage.js listens for Palace's other windows as it loads.
+// storage.js listens for Recastle's other windows as it loads.
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => () => {}) }));
 vi.mock("@tauri-apps/api/webviewWindow", () => ({ getCurrentWebviewWindow: () => ({ label: "main" }) }));
 // settings.js sets the window's theme as it loads.

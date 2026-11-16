@@ -52,8 +52,8 @@ function openFirstRecent() {
   <main class="welcome">
     <span v-if="starting" class="starting"><Spinner :size="22" /></span>
     <div v-else class="welcome-card">
-      <img src="/palace.svg" alt="" class="welcome-icon" />
-      <h1>Palace</h1>
+      <img src="/recastle.svg" alt="" class="welcome-icon" />
+      <h1>Recastle</h1>
       <p class="dim">Open a Git repository to get started.</p>
 
       <p v-if="error" class="error"><CircleAlert :size="15" /> {{ error }}</p>
@@ -138,7 +138,7 @@ function openFirstRecent() {
   gap: 10px;
 }
 
-/* Palace's icon. Its tile leaves a margin, as desktop icons do, which the negative
+/* Recastle's icon. Its tile leaves a margin, as desktop icons do, which the negative
    margin takes back. */
 .welcome-icon {
   width: 72px;

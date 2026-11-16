@@ -1,19 +1,19 @@
 //! The system notifications that say a terminal's agent finished or needs you, on Linux,
-//! sent to the desktop's notification server over D-Bus by Palace itself rather than
+//! sent to the desktop's notification server over D-Bus by Recastle itself rather than
 //! through the notification plugin. Clicking one brings its terminal tab forward, and
-//! for that the server first hands Palace an activation token (GNOME does), which the
+//! for that the server first hands Recastle an activation token (GNOME does), which the
 //! window is raised with. The plugin passes the click on but not the token, so the
-//! desktop went on showing Palace as starting, with a busy cursor, for a few seconds.
+//! desktop went on showing Recastle as starting, with a busy cursor, for a few seconds.
 //! macOS goes on using the plugin.
 
-/// Whether Palace can show the system's notifications. On macOS that needs Palace to run
+/// Whether Recastle can show the system's notifications. On macOS that needs Recastle to run
 /// from its app bundle: the notification center throws, and the process aborts, when
 /// asked from a bare executable, as `tauri dev` runs.
 #[tauri::command]
 pub fn can_notify() -> bool {
     #[cfg(target_os = "macos")]
     {
-        // …/Palace.app/Contents/MacOS/palace
+        // …/Recastle.app/Contents/MacOS/recastle
         std::env::current_exe()
             .ok()
             .and_then(|exe| exe.ancestors().nth(3).map(|app| app.extension().is_some_and(|e| e == "app")))
@@ -35,12 +35,12 @@ pub async fn notify_tab(app: tauri::AppHandle, window: tauri::WebviewWindow, tit
     #[cfg(not(target_os = "linux"))]
     {
         let _ = (app, window, title, body, path, key);
-        Err("Palace sends its own notifications only on Linux.".into())
+        Err("Recastle sends its own notifications only on Linux.".into())
     }
 }
 
 /// Withdraws the notifications shown from the terminal tab `key` in `window`, as when
-/// it's been looked at, so they leave the desktop's list and the count on Palace's icon.
+/// it's been looked at, so they leave the desktop's list and the count on Recastle's icon.
 #[tauri::command]
 pub async fn withdraw_notifications(window: tauri::WebviewWindow, key: u32) {
     #[cfg(target_os = "linux")]
@@ -106,13 +106,13 @@ mod linux {
     pub fn notify(app: AppHandle, window: String, title: String, body: String, path: String, key: u32) -> Result<(), String> {
         let server = server(&app).ok_or("Couldn't reach the desktop's notifications.")?;
         let mut hints: HashMap<&str, Value> = HashMap::new();
-        // The app it's from, for its name and icon: Palace.desktop.
-        hints.insert("desktop-entry", Value::from("Palace"));
+        // The app it's from, for its name and icon: Recastle.desktop.
+        hints.insert("desktop-entry", Value::from("Recastle"));
         // "default" is the notification itself, clicked.
         let actions = vec!["default", ""];
         let reply = server
             .connection
-            .call_method(Some(SERVER), PATH, Some(SERVER), "Notify", &("Palace", 0u32, "", title.as_str(), body.as_str(), actions, hints, -1i32))
+            .call_method(Some(SERVER), PATH, Some(SERVER), "Notify", &("Recastle", 0u32, "", title.as_str(), body.as_str(), actions, hints, -1i32))
             .map_err(|e| format!("Couldn't show a notification: {e}"))?;
         let id: u32 = reply.body().deserialize().map_err(|e| format!("Couldn't show a notification: {e}"))?;
         server.shown.lock().unwrap().insert(id, Shown { window, path, key, token: None });

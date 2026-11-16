@@ -21,7 +21,7 @@ export function recentRepositories() {
 }
 
 /**
- * The folder Palace knows the repository `overview` shows by: its own, even with one of
+ * The folder Recastle knows the repository `overview` shows by: its own, even with one of
  * its worktrees open, so what's kept for it, such as its place among the recent ones or
  * its branches' arrangement, is the same from each. Without one, as for a bare
  * repository, it's the worktree's.
@@ -32,7 +32,7 @@ export function repositoryFolder(overview) {
 
 /**
  * `recents` with the repository `overview` shows put first: as its own folder, when a
- * worktree added to it is open, and without those worktrees, which an older Palace listed.
+ * worktree added to it is open, and without those worktrees, which an older Recastle listed.
  */
 export function remembering(recents, overview) {
   const path = repositoryFolder(overview);

@@ -1,6 +1,6 @@
 //! Apps opened from the Dock or Finder on macOS start with a bare PATH
 //! (/usr/bin:/bin:/usr/sbin:/sbin), without Homebrew's git or the tools that hooks
-//! run, such as node or php. Palace takes its PATH from the user's login shell
+//! run, such as node or php. Recastle takes its PATH from the user's login shell
 //! instead, so git and hooks find what they would in Terminal.
 
 use std::io::Read;
@@ -9,7 +9,7 @@ use std::sync::mpsc;
 use std::time::Duration;
 
 // Marks the PATH in the shell's output, which startup files may print to as well.
-const MARK: &str = "__PALACE_PATH__";
+const MARK: &str = "__RECASTLE_PATH__";
 
 /// Replaces this process's PATH with the login shell's. Call it at startup, before
 /// any other threads exist.
@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn gives_up_on_a_shell_that_never_finishes() {
-        let dir = std::env::temp_dir().join(format!("palace-shell-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-shell-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let shell = dir.join("slow-shell");
         std::fs::write(&shell, "#!/bin/sh\nsleep 30\n").unwrap();

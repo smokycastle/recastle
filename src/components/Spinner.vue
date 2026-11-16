@@ -1,6 +1,6 @@
 <script setup>
 // For something that's loading, usually beside a few words saying what: a light running
-// around the outline of Palace's gate, as in its icon.
+// around the outline of Recastle's gate, as in its icon.
 defineProps({ size: { type: Number, default: 15 } });
 
 const GATE = "M3 14.5 V7.5 A5 5 0 0 1 13 7.5 V14.5 Z";

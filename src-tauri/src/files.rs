@@ -168,7 +168,7 @@ pub async fn save_working_file(path: String, file: String, text: String, crlf: b
 
     let name = full.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     let nanos = std::time::SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
-    let temp = parent.join(format!(".{name}.palace-{}-{nanos}.tmp", std::process::id()));
+    let temp = parent.join(format!(".{name}.recastle-{}-{nanos}.tmp", std::process::id()));
     let written = (|| {
         let mut out = fs::File::create(&temp)?;
         out.write_all(&bytes)?;
@@ -223,7 +223,7 @@ pub async fn duplicate_working_file(path: String, file: String) -> Result<String
     let full = inside(&workdir, &file)?;
     let meta = fs::symlink_metadata(&full).map_err(|e| format!("Couldn't duplicate {file}: {e}"))?;
     if !meta.is_file() {
-        return Err(format!("{file} isn't a file Palace can duplicate."));
+        return Err(format!("{file} isn't a file Recastle can duplicate."));
     }
     let parent = full.parent().ok_or_else(|| format!("Couldn't duplicate {file}."))?;
     let real_parent = parent.canonicalize().map_err(|e| format!("Couldn't duplicate {file}: {e}"))?;
@@ -310,7 +310,7 @@ fn delete(path: &str, file: &str, trash: &dyn Fn(&Path) -> Result<(), String>) -
     trash(&full)
 }
 
-/// Whether git ignores `relative`, a path in the working copy, as Palace means it: an
+/// Whether git ignores `relative`, a path in the working copy, as Recastle means it: an
 /// ignore rule matches it, and it isn't tracked anyway. Rules alone say a tracked file
 /// is ignored when it matches one, as one added before the rule was, and so a folder
 /// such as an ignored logs/ kept by a tracked .gitkeep in it.
@@ -660,7 +660,7 @@ mod tests {
     #[test]
     fn creating_refuses_to_go_through_links_outside() {
         let t = TempRepo::new("files-create-link");
-        let outside = std::env::temp_dir().join(format!("palace-test-outside-dir-{}", std::process::id()));
+        let outside = std::env::temp_dir().join(format!("recastle-test-outside-dir-{}", std::process::id()));
         fs::create_dir_all(&outside).unwrap();
         std::os::unix::fs::symlink(&outside, t.dir.join("elsewhere")).unwrap();
         assert!(block_on(create_working_file(path(&t), "elsewhere/new.txt".into(), false)).is_err());
@@ -672,7 +672,7 @@ mod tests {
     #[test]
     fn saving_refuses_links() {
         let t = TempRepo::new("files-link");
-        let outside = std::env::temp_dir().join(format!("palace-test-outside-{}", std::process::id()));
+        let outside = std::env::temp_dir().join(format!("recastle-test-outside-{}", std::process::id()));
         fs::write(&outside, "secret\n").unwrap();
         std::os::unix::fs::symlink(&outside, t.dir.join("link.txt")).unwrap();
         let read = block_on(read_working_file(path(&t), "link.txt".into(), None)).unwrap();

@@ -2,9 +2,9 @@ import { expect, test } from "vitest";
 import { folderName, formatBeside, formatWhen } from "./format.js";
 
 test("names a folder by its last part", () => {
-  expect(folderName("/code/palace")).toBe("palace");
-  expect(folderName("/code/palace/")).toBe("palace");
-  expect(folderName("C:\\code\\palace")).toBe("palace");
+  expect(folderName("/code/recastle")).toBe("recastle");
+  expect(folderName("/code/recastle/")).toBe("recastle");
+  expect(folderName("C:\\code\\recastle")).toBe("recastle");
   expect(folderName("/")).toBe("/");
 });
 

@@ -1,4 +1,4 @@
-//! Running the git CLI. Palace uses it for everything that changes a repository, so
+//! Running the git CLI. Recastle uses it for everything that changes a repository, so
 //! hooks, signing, credential helpers and the user's git config all apply.
 
 use git2::Repository;
@@ -49,7 +49,7 @@ pub(crate) fn git_in(dir: &Path, args: &[&str]) -> Result<String, String> {
     if output.status.success() { Ok(stdout) } else { Err(join_output(&stderr, &stdout)) }
 }
 
-/// The oldest git Palace works with: `git pull --autostash` needs 2.27 when merging.
+/// The oldest git Recastle works with: `git pull --autostash` needs 2.27 when merging.
 const MINIMUM_GIT: (u32, u32) = (2, 27);
 
 #[derive(serde::Serialize, Debug, PartialEq)]
@@ -60,7 +60,7 @@ pub struct GitCheck {
     supported: bool,
 }
 
-/// Whether a git Palace can use is installed. Checked at startup.
+/// Whether a git Recastle can use is installed. Checked at startup.
 #[tauri::command]
 pub async fn git_check() -> GitCheck {
     let output = Command::new("git").arg("--version").stdin(Stdio::null()).output();
@@ -69,7 +69,7 @@ pub async fn git_check() -> GitCheck {
 }
 
 /// Opens Apple's installer for the Command Line Tools, which include git. It runs on
-/// its own; Palace checks for git again when the user says it's done.
+/// its own; Recastle checks for git again when the user says it's done.
 #[tauri::command]
 pub async fn install_git_tools() -> Result<(), String> {
     #[cfg(target_os = "macos")]
@@ -257,7 +257,7 @@ fn run_with_progress(mut command: Command, running: &Running, mut on_progress: i
 pub(crate) fn command(workdir: &PathBuf, args: &[&str]) -> Command {
     let mut command = Command::new("git");
     command
-        // When signed in to GitHub in Palace, git asks Palace for github.com logins.
+        // When signed in to GitHub in Recastle, git asks Recastle for github.com logins.
         .args(crate::github::git_config_args())
         .args(args)
         .current_dir(workdir)
@@ -271,7 +271,7 @@ pub(crate) fn command(workdir: &PathBuf, args: &[&str]) -> Command {
         command.env("GIT_LITERAL_PATHSPECS", "1");
     }
 
-    // Start git in a new session with no controlling terminal. Otherwise, when Palace
+    // Start git in a new session with no controlling terminal. Otherwise, when Recastle
     // is launched from a terminal, ssh would ask for a passphrase there and hang.
     // Without a terminal, ssh and gpg fall back to the desktop's agent or GUI prompt.
     #[cfg(unix)]

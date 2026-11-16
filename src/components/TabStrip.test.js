@@ -32,10 +32,10 @@ function render(props) {
 const pointer = (type, x, y = 20) => new PointerEvent(type, { button: 0, clientX: x, clientY: y, bubbles: true });
 
 test("names each tab for its repository, its branch and what its agent's doing below, and one with none New Tab", () => {
-  const palace = tab(1, "palace", { ahead: 2, behind: 1, changes: 3 });
-  const { root } = render({ tabs: [palace, tab(2, null, { branch: null })], active: 1, agents: { "/code/palace": "blocked" } });
+  const recastle = tab(1, "recastle", { ahead: 2, behind: 1, changes: 3 });
+  const { root } = render({ tabs: [recastle, tab(2, null, { branch: null })], active: 1, agents: { "/code/recastle": "blocked" } });
   const tabs = root.querySelectorAll(".tab");
-  expect(tabs[0].querySelector(".name").textContent).toBe("palace");
+  expect(tabs[0].querySelector(".name").textContent).toBe("recastle");
   const parts = [...tabs[0].querySelectorAll(".detail > span")].map((part) => [part.className, part.textContent]);
   expect(parts).toEqual([
     ["branch", "main"],
@@ -44,30 +44,30 @@ test("names each tab for its repository, its branch and what its agent's doing b
     ["changes", "3 changed"],
   ]);
   expect(tabs[0].querySelector(".tile.blocked .badge")).not.toBeNull();
-  expect(tabs[0].title).toBe("/code/palace\nIts agent needs you");
+  expect(tabs[0].title).toBe("/code/recastle\nIts agent needs you");
   expect(tabs[0].classList.contains("active")).toBe(true);
   expect(tabs[1].textContent).toContain("New Tab");
   expect(tabs[1].querySelector(".detail, .tile")).toBeNull();
 });
 
 test("each tab is known by a tile in its repository's color, a worktree's the same as its repository's", () => {
-  const worktree = tab(2, "palace-tabs", { home: "/code/palace", worktree: true });
-  const { root } = render({ tabs: [tab(1, "palace", { home: "/code/palace" }), worktree, tab(3, "api", { home: "/code/api" })], active: 1, agents: { "/code/palace": "working" } });
-  const [palace, tabs, api] = root.querySelectorAll(".tab");
-  expect(palace.querySelector(".tile").textContent.trim()).toBe("P");
-  expect(palace.querySelector(".tile.working > .spinning .spinner")).not.toBeNull();
-  expect(palace.style.getPropertyValue("--tab-color")).toMatch(/^var\(--graph-[1-6]\)$/);
+  const worktree = tab(2, "recastle-tabs", { home: "/code/recastle", worktree: true });
+  const { root } = render({ tabs: [tab(1, "recastle", { home: "/code/recastle" }), worktree, tab(3, "api", { home: "/code/api" })], active: 1, agents: { "/code/recastle": "working" } });
+  const [recastle, tabs, api] = root.querySelectorAll(".tab");
+  expect(recastle.querySelector(".tile").textContent.trim()).toBe("R");
+  expect(recastle.querySelector(".tile.working > .spinning .spinner")).not.toBeNull();
+  expect(recastle.style.getPropertyValue("--tab-color")).toMatch(/^var\(--graph-[1-6]\)$/);
   // The worktree, with the branch mark rather than an initial, in its repository's color.
   expect(tabs.querySelector(".tile svg")).not.toBeNull();
   expect(tabs.querySelector(".tile").textContent.trim()).toBe("");
-  expect(tabs.style.getPropertyValue("--tab-color")).toBe(palace.style.getPropertyValue("--tab-color"));
+  expect(tabs.style.getPropertyValue("--tab-color")).toBe(recastle.style.getPropertyValue("--tab-color"));
   expect(api.querySelector(".tile").textContent.trim()).toBe("A");
 });
 
 test("of two tabs named alike, the folder each is in is shown before its name, fainter", () => {
-  const { root } = render({ tabs: [tab(1, "palace", { path: "/work/palace" }), tab(2, "palace", { path: "/oss/palace" })], active: 1 });
+  const { root } = render({ tabs: [tab(1, "recastle", { path: "/work/recastle" }), tab(2, "recastle", { path: "/oss/recastle" })], active: 1 });
   const names = [...root.querySelectorAll(".name")];
-  expect(names.map((name) => name.textContent)).toEqual(["work/palace", "oss/palace"]);
+  expect(names.map((name) => name.textContent)).toEqual(["work/recastle", "oss/recastle"]);
   expect(names[1].querySelector(".parent").textContent).toBe("oss/");
 });
 

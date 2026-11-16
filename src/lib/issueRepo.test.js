@@ -111,7 +111,7 @@ describe("which repository", () => {
     const { result } = setUp();
     expect(result.issueRepo.value).toMatchObject({ owner: "me", repo: "app" });
     expect(result.showsIssues.value).toBe(false);
-    // Until Palace knows whether it's signed in, they stay.
+    // Until Recastle knows whether it's signed in, they stay.
     githubAccountChecked.value = false;
     expect(result.showsIssues.value).toBe(true);
   });

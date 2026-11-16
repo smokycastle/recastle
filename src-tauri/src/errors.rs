@@ -8,12 +8,12 @@
 /// aside for it conflicted when put back.
 pub(crate) const CONFLICT: &str = "CONFLICT: ";
 
-/// Starts the refusal for a folder that isn't in a repository, so Palace can offer to
+/// Starts the refusal for a folder that isn't in a repository, so Recastle can offer to
 /// create one there.
 pub(crate) const NOT_A_REPOSITORY: &str = "NOT_A_REPOSITORY: ";
 
 /// Starts the refusal to replace pr-N's own commits with a rewritten pull request: then
-/// how many of them there are, or "?" when Palace can't tell which are the user's.
+/// how many of them there are, or "?" when Recastle can't tell which are the user's.
 pub(crate) const PULL_REWRITTEN: &str = "PULL_REWRITTEN: ";
 
 /// Starts the refusal to save over a file that changed on disk since it was read, so

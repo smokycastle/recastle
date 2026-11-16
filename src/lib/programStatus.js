@@ -1,10 +1,10 @@
 // The Program Status Protocol (OSC 7501): a program in a terminal says what it's doing,
-// working, waiting on the user, or done, as Claude Code does from v2.1.295. Palace
+// working, waiting on the user, or done, as Claude Code does from v2.1.295. Recastle
 // shows it on the terminal tabs, and tells the system when one finishes or needs you
 // while you're looking elsewhere. The protocol, by Mitchell Hashimoto:
 // https://www.superlogical.com/rex/docs/build/program-status
 
-/** The OSC number, and what Palace answers a program asking whether it's understood. */
+/** The OSC number, and what Recastle answers a program asking whether it's understood. */
 export const OSC = 7501;
 export const SUPPORTED_REPLY = "\x1b]7501;?\x1b\\";
 

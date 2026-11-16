@@ -73,7 +73,7 @@ onMounted(show);
 // seen, and why, and what to do about it (see unreported.js); or what its program last
 // said it's doing.
 const UNREPORTED =
-  "Claude Code isn't telling Palace what it's doing, so Palace can't show when it's working. Most often, its session is running in the background and only shown here. To see it, end that session, then resume it in this tab.";
+  "Claude Code isn't telling Recastle what it's doing, so Recastle can't show when it's working. Most often, its session is running in the background and only shown here. To see it, end that session, then resume it in this tab.";
 const tabTitle = (tab) => [label(tab), tab.unreported ? UNREPORTED : statusText(tab.status)].filter(Boolean).join(": ");
 
 // What a tab's program last said it's doing.
@@ -198,7 +198,7 @@ function newTerminal() {
 const command = computed(() => agentCommand(props.path));
 const agent = computed(() => agentName(command.value));
 
-// An agent tab running an agent Palace knows checks it's installed first: without it,
+// An agent tab running an agent Recastle knows checks it's installed first: without it,
 // the tab would open to "command not found". Instead it says how to install it, and can
 // type the installer into a new terminal to run. A command that starts with something
 // else, such as "cd api && claude" or an alias, is the shell's to run, so it isn't
@@ -213,7 +213,7 @@ async function newAgent(run = command.value) {
   openTerminal(props.path, { command: run, kind: "agent" });
 }
 
-// Which of the agents Palace offers are installed, by program, as last checked: when
+// Which of the agents Recastle offers are installed, by program, as last checked: when
 // the panel opens, and again each time the ⋯ menu does.
 const installed = ref({});
 async function checkInstalled() {
@@ -233,7 +233,7 @@ async function editAgentCommand() {
   if (values) setAgentCommand(props.path, values.command ?? "");
 }
 
-// The ⋯ menu: a new tab of the repository's agent, then of each other agent Palace
+// The ⋯ menu: a new tab of the repository's agent, then of each other agent Recastle
 // offers, for one tab, without changing the repository's. Opening it checks again
 // which are installed, and an agent installed since shows so as soon as that's known,
 // with the menu still open.
@@ -348,7 +348,7 @@ function startResize(event) {
           @contextmenu.prevent="tabMenu($event, tab)"
         >
           <Spinner v-if="tab.status?.state === 'working'" :size="13" />
-          <!-- Claude Code whose state can't be seen: a plug, not plugged into Palace. -->
+          <!-- Claude Code whose state can't be seen: a plug, not plugged into Recastle. -->
           <Plug v-else-if="tab.unreported" class="unreported" :size="15" :stroke-width="1.75" />
           <AgentIcon v-else-if="tab.kind === 'agent'" :name="tab.agent" />
           <SquareTerminal v-else :size="13" :stroke-width="1.75" />

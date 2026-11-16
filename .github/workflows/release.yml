@@ -1,6 +1,6 @@
-# Builds Palace's Linux and macOS packages.
+# Builds Recastle's Linux and macOS packages.
 #
-# Pushing a version tag such as v1.2.0 (made in Palace, with `npm run release`, or
+# Pushing a version tag such as v1.2.0 (made in Recastle, with `npm run release`, or
 # with git) makes a draft GitHub release, builds the Linux and macOS packages for it
 # at the same time, then publishes it once both are there, and the website shows its
 # version. Running the workflow by hand from the Actions tab builds the packages
@@ -38,7 +38,7 @@ jobs:
 
       # actions/checkout leaves the tag without its message, so it's fetched again. A
       # signed tag's signature isn't part of the notes, and nor is the message
-      # `npm run release` gives a tag without notes ("Palace v1.2.0").
+      # `npm run release` gives a tag without notes ("Recastle v1.2.0").
       - name: Read the release notes from the tag
         id: notes
         run: |
@@ -48,7 +48,7 @@ jobs:
           if [ "$(git cat-file -t "$tag")" = tag ]; then
             notes=$(git for-each-ref --format='%(contents)' "$tag" | sed '/^-----BEGIN [A-Z ]*SIGNATURE-----$/,$d')
           fi
-          if [ "$notes" = "Palace $GITHUB_REF_NAME" ]; then notes=""; fi
+          if [ "$notes" = "Recastle $GITHUB_REF_NAME" ]; then notes=""; fi
           # A delimiter the notes can't contain.
           end="END_$(openssl rand -hex 16)"
           {
@@ -71,20 +71,20 @@ jobs:
               printf '%s' "$BODY"
               cat <<'INSTALL'
           **Ubuntu / Debian:** download the `.deb`, then run
-          `sudo apt install ./Palace_*.deb` in the folder you saved it to.
+          `sudo apt install ./Recastle_*.deb` in the folder you saved it to.
 
           **Other distributions:** download the `.AppImage`, make it executable
-          (`chmod +x Palace_*.AppImage`) and run it. It needs `git` installed,
+          (`chmod +x Recastle_*.AppImage`) and run it. It needs `git` installed,
           and on Ubuntu 22.04 and later, `libfuse2` (`libfuse2t64` on 24.04 and later).
 
           **macOS** (11 or later, Apple Silicon or Intel): download the `.dmg`, open it and
-          drag Palace to Applications.
+          drag Recastle to Applications.
           INSTALL
             } > notes.md
             # Its id from making it: GitHub's list of releases can take a moment to
             # include a new draft.
             id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" \
-              -f tag_name="$GITHUB_REF_NAME" -f name="Palace $GITHUB_REF_NAME" -F draft=true -F body=@notes.md --jq .id)
+              -f tag_name="$GITHUB_REF_NAME" -f name="Recastle $GITHUB_REF_NAME" -F draft=true -F body=@notes.md --jq .id)
           fi
           # Without it, the builds would build but have nowhere to put the packages.
           if [ -z "$id" ]; then
@@ -133,9 +133,9 @@ jobs:
         if: env.IS_RELEASE == 'true'
         run: node scripts/set-version.mjs "$GITHUB_REF_NAME"
 
-      # Releases also carry signed update files, which installed copies of Palace check
+      # Releases also carry signed update files, which installed copies of Recastle check
       # for updates, described by a latest.json the publish job writes. The signing key
-      # lives in the repository's secrets; Palace only installs updates signed with it.
+      # lives in the repository's secrets; Recastle only installs updates signed with it.
       - name: Build and add to the release
         if: env.IS_RELEASE == 'true'
         uses: tauri-apps/tauri-action@v0
@@ -156,7 +156,7 @@ jobs:
         if: env.IS_RELEASE != 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: palace-linux-packages
+          name: recastle-linux-packages
           path: |
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/appimage/*.AppImage
@@ -229,7 +229,7 @@ jobs:
       # release then stays a draft (see publish).
       - name: Check Apple accepts the app
         run: |
-          app=src-tauri/target/universal-apple-darwin/release/bundle/macos/Palace.app
+          app=src-tauri/target/universal-apple-darwin/release/bundle/macos/Recastle.app
           codesign --verify --deep --strict --verbose=2 "$app"
           codesign -dvv "$app" 2>&1 | grep -E "^(Authority|TeamIdentifier|Runtime)"
           xcrun stapler validate "$app"
@@ -239,7 +239,7 @@ jobs:
         if: env.IS_RELEASE != 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: palace-macos
+          name: recastle-macos
           path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
@@ -260,9 +260,9 @@ jobs:
           tag="$GITHUB_REF_NAME"
           version="${tag#v}"
           url="https://github.com/$GH_REPO/releases/download/$tag"
-          appimage="Palace_${version}_amd64.AppImage"
-          deb="Palace_${version}_amd64.deb"
-          app="Palace_universal.app.tar.gz"
+          appimage="Recastle_${version}_amd64.AppImage"
+          deb="Recastle_${version}_amd64.deb"
+          app="Recastle_universal.app.tar.gz"
           for file in "$appimage" "$deb" "$app"; do
             gh release download "$tag" --pattern "$file.sig" --dir sigs
           done
@@ -320,7 +320,7 @@ jobs:
             exit 0
           fi
           sed -i -E "s/Version [0-9]+\.[0-9]+\.[0-9]+/Version $version/" index.html
-          sed -i -E "s#releases/download/v[0-9]+\.[0-9]+\.[0-9]+/Palace_[0-9]+\.[0-9]+\.[0-9]+_#releases/download/v$version/Palace_${version}_#g" index.html
+          sed -i -E "s#releases/download/v[0-9]+\.[0-9]+\.[0-9]+/Recastle_[0-9]+\.[0-9]+\.[0-9]+_#releases/download/v$version/Recastle_${version}_#g" index.html
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "Show version $version"

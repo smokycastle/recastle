@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-// Palace's saved data, by key: kept by Palace in a file (see store.rs), and read from
+// Recastle's saved data, by key: kept by Recastle in a file (see store.rs), and read from
 // memory once loadStore() has run, before the app starts. Values can be stale or
 // missing, so every read falls back to a default instead of throwing.
 let values = {};
@@ -10,7 +10,7 @@ let saving = Promise.resolve();
 
 /**
  * Why the saved data couldn't be read at startup, or "". Then nothing is saved, so
- * none of it is overwritten, until Palace restarts.
+ * none of it is overwritten, until Recastle restarts.
  */
 export let storeProblem = "";
 

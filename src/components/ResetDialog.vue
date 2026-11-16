@@ -77,7 +77,7 @@ function onKeydown(event) {
   <div class="backdrop" @mousedown.self="closeResetDialog(null)" @keydown="onKeydown">
     <form class="dialog" @keydown="submitOnEnter" @submit.prevent="submit">
       <header>
-        <img src="/palace.svg" alt="" class="app-icon" />
+        <img src="/recastle.svg" alt="" class="app-icon" />
         <div>
           <h2>Reset “{{ target }}” to Revision</h2>
           <p v-if="dialog.checkedOut === false">

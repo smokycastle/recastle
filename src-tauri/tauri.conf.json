@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Palace",
+  "productName": "Recastle",
   "version": "0.46.1",
-  "identifier": "com.timmcleod.palace",
+  "identifier": "com.smokycastle.recastle",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Palace",
+        "title": "Recastle",
         "width": 1440,
         "height": 900,
         "minWidth": 900,
@@ -33,7 +33,7 @@
     ],
     "category": "DeveloperTool",
     "shortDescription": "Run your agent, review its work, ship it",
-    "longDescription": "Your agent writes the code. Palace shows you what changed. You decide what gets shipped.",
+    "longDescription": "Your agent writes the code. Recastle shows you what changed. You decide what gets shipped.",
     "publisher": "Tim McLeod",
     "copyright": "Copyright © 2026 Tim McLeod",
     "license": "MIT",
@@ -49,6 +49,12 @@
       "deb": {
         "depends": [
           "git"
+        ],
+        "conflicts": [
+          "palace"
+        ],
+        "replaces": [
+          "palace"
         ]
       }
     }

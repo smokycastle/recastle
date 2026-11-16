@@ -42,7 +42,7 @@ function onKeydown(event) {
   <div class="backdrop" @mousedown.self="closeMergeDialog(null)" @keydown="onKeydown">
     <form ref="form" class="dialog" @keydown="submitOnEnter" @submit.prevent="submit">
       <header>
-        <img src="/palace.svg" alt="" class="app-icon" />
+        <img src="/recastle.svg" alt="" class="app-icon" />
         <div>
           <template v-if="dialog.rebase">
             <h2>Rebase</h2>

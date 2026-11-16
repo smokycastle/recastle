@@ -24,7 +24,7 @@ import { settings } from "../lib/settings.js";
 import { NEW_TERMINAL_KEYS, shortcut } from "../lib/platform.js";
 import { cloneFolder } from "../lib/clone.js";
 import { checkForUpdates, updates } from "../lib/updates.js";
-import { PALACE_URL } from "../lib/star.js";
+import { RECASTLE_URL } from "../lib/star.js";
 import castleUrl from "../assets/castle.webp";
 
 // The repository open, if one is: with none, as from the welcome screen, there's no
@@ -84,14 +84,14 @@ function release() {
   chosen = null;
 }
 
-// What the system's About panel said: the copyright and license, from Palace's
+// What the system's About panel said: the copyright and license, from Recastle's
 // configuration (see about.rs), at the foot of the page.
 const about = ref(null);
-invoke("about_palace")
+invoke("about_recastle")
   .then((value) => (about.value = value))
   .catch(() => {});
 
-/** Scrolls back to the top, where Palace's version and Check for Updates are: its About page. */
+/** Scrolls back to the top, where Recastle's version and Check for Updates are: its About page. */
 function scrollToTop() {
   release();
   current.value = SECTIONS[0].id;
@@ -187,9 +187,9 @@ const updateStatus = computed(() => {
     case "none":
       return "Up to date";
     case "available":
-      return `Palace ${updates.version} is available`;
+      return `Recastle ${updates.version} is available`;
     case "installing":
-      return `Installing Palace ${updates.version}…`;
+      return `Installing Recastle ${updates.version}…`;
     case "error":
       return `Couldn't check for updates: ${updates.error}`;
     default:
@@ -273,7 +273,7 @@ const SAMPLE = {
           <div class="hero-content">
             <div class="hero-title">
               <GateLogo :state="updates.state" class="hero-icon" />
-              <h1>Palace</h1>
+              <h1>Recastle</h1>
             </div>
             <span class="hero-version">
               Version {{ updates.current || "…" }}
@@ -292,7 +292,7 @@ const SAMPLE = {
               >
                 Check for Updates
               </button>
-              <button class="hero-button" @click="openUrl(PALACE_URL)"><Star :size="14" /> Star on GitHub</button>
+              <button class="hero-button" @click="openUrl(RECASTLE_URL)"><Star :size="14" /> Star on GitHub</button>
             </div>
           </div>
         </header>
@@ -306,7 +306,7 @@ const SAMPLE = {
               <div class="text">
                 <div class="title">{{ account.name || account.login }}</div>
                 <div class="desc">
-                  Signed in as {{ account.login }}. Palace fetches, pulls and pushes with your token, private
+                  Signed in as {{ account.login }}. Recastle fetches, pulls and pushes with your token, private
                   repositories included. Git in the terminal isn't affected.
                 </div>
               </div>
@@ -316,10 +316,10 @@ const SAMPLE = {
               <div class="text">
                 <div class="title">Not signed in</div>
                 <div class="desc">
-                  Sign in so Palace can fetch, pull and push your GitHub repositories, private ones included, without
+                  Sign in so Recastle can fetch, pull and push your GitHub repositories, private ones included, without
                   setting up a login for git yourself.
                   <button class="link-button" @click="openUrl(NEW_TOKEN_URL)">Create a token</button>
-                  with the scopes Palace needs (they're ticked for you), copy it, then sign in with it.
+                  with the scopes Recastle needs (they're ticked for you), copy it, then sign in with it.
                 </div>
               </div>
               <button class="primary-button" :disabled="signingIn" @click="signIn">
@@ -537,7 +537,7 @@ const SAMPLE = {
                 <div class="title">Save files automatically</div>
                 <div class="desc">
                   Edits in the Files view save a moment after you stop typing, and when you open another file or leave
-                  Palace. Off, save with {{ shortcut("Ctrl+S") }}.
+                  Recastle. Off, save with {{ shortcut("Ctrl+S") }}.
                 </div>
               </div>
               <label class="switch"><input v-model="settings.autoSave" type="checkbox" /><span /></label>
@@ -645,7 +645,7 @@ const SAMPLE = {
               <div class="text">
                 <div class="title">Check for updates automatically</div>
                 <div class="desc">
-                  When Palace starts, then once a day. Updates are installed only when you say so.
+                  When Recastle starts, then once a day. Updates are installed only when you say so.
                 </div>
               </div>
               <label class="switch"><input v-model="settings.checkForUpdates" type="checkbox" /><span /></label>
@@ -661,8 +661,8 @@ const SAMPLE = {
 
         <footer v-if="about" class="colophon">
           <span v-if="about.copyright">{{ about.copyright }}</span>
-          <button v-if="about.license" @click="openUrl(`${PALACE_URL}/blob/main/LICENSE`)">{{ about.license }} License</button>
-          <button @click="openUrl(PALACE_URL)">Source on GitHub</button>
+          <button v-if="about.license" @click="openUrl(`${RECASTLE_URL}/blob/main/LICENSE`)">{{ about.license }} License</button>
+          <button @click="openUrl(RECASTLE_URL)">Source on GitHub</button>
         </footer>
       </div>
     </div>

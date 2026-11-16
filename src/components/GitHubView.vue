@@ -166,7 +166,7 @@ async function signIn() {
         <Github :size="40" :stroke-width="1.25" />
         <h2>Sign in to GitHub</h2>
         <p>
-          See your repositories and your organizations', private ones included, and clone them in a click. Palace signs
+          See your repositories and your organizations', private ones included, and clone them in a click. Recastle signs
           in with a personal access token.
         </p>
         <ol>

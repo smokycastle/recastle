@@ -1,4 +1,4 @@
-//! Palace's own saved data: settings, recent repositories, the sidebar's branch order
+//! Recastle's own saved data: settings, recent repositories, the sidebar's branch order
 //! and the like, as JSON values by key in a file in the app's data folder. The web
 //! view's storage isn't safe for it: a web view that starts while another still holds
 //! that storage starts with none, and the first thing saved then overwrites it all.
@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
 
-/// Whether the file was readable when Palace started. When it wasn't, nothing is
+/// Whether the file was readable when Recastle started. When it wasn't, nothing is
 /// saved over it.
 #[derive(Default)]
 pub struct Store(Mutex<Option<bool>>);
@@ -18,7 +18,7 @@ pub struct Store(Mutex<Option<bool>>);
 pub(crate) const FILE: &str = if cfg!(debug_assertions) { "saved-dev.json" } else { "saved.json" };
 
 fn file(app: &AppHandle) -> Result<PathBuf, String> {
-    let dir = app.path().app_data_dir().map_err(|e| format!("Couldn't find Palace's data folder: {e}"))?;
+    let dir = app.path().app_data_dir().map_err(|e| format!("Couldn't find Recastle's data folder: {e}"))?;
     Ok(dir.join(FILE))
 }
 
@@ -32,12 +32,12 @@ pub fn load_store(app: AppHandle, store: tauri::State<Store>) -> Result<Option<M
 }
 
 /// Saves each value under its key, leaving the others as they are in the file, which
-/// may have been saved by another copy of Palace.
+/// may have been saved by another copy of Recastle.
 #[tauri::command]
 pub fn save_store(app: AppHandle, window: tauri::WebviewWindow, store: tauri::State<Store>, values: Map<String, Value>) -> Result<(), String> {
     let readable = store.0.lock().unwrap();
     if *readable != Some(true) {
-        return Err("Palace couldn't read its saved settings when it started, so it isn't saving over them.".into());
+        return Err("Recastle couldn't read its saved settings when it started, so it isn't saving over them.".into());
     }
     write(&file(&app)?, values.clone())?;
     // The other windows take what's changed, so they don't save over it with what they had.
@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     fn saving_keeps_the_other_keys() {
-        let dir = std::env::temp_dir().join(format!("palace-test-store-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-store-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         let path = dir.join(FILE);
         assert_eq!(read(&path).unwrap(), None);

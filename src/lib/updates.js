@@ -5,7 +5,7 @@ import { check } from "@tauri-apps/plugin-updater";
 import { settings } from "./settings.js";
 
 // Updates come from the latest GitHub release, whose latest.json lists the newest
-// version and its signed packages. Palace checks a few seconds after starting, then
+// version and its signed packages. Recastle checks a few seconds after starting, then
 // daily, and installs only when asked, checking once more first so it installs the
 // newest.
 export const updates = reactive({
@@ -17,7 +17,7 @@ export const updates = reactive({
   downloaded: 0,
   total: 0,
   error: "",
-  // Hidden with "Later" until Palace next starts or finds a newer version.
+  // Hidden with "Later" until Recastle next starts or finds a newer version.
   dismissed: false,
 });
 
@@ -82,7 +82,7 @@ export async function checkForUpdates({ quiet = false } = {}) {
   }
 }
 
-// The updater's own wording, in Palace's where it's unclear.
+// The updater's own wording, in Recastle's where it's unclear.
 function explain(message) {
   // The newest release has no download for this kind of computer, such as a Linux-only
   // release checked from a Mac.
@@ -91,7 +91,7 @@ function explain(message) {
 }
 
 /**
- * Downloads and installs the update, then restarts Palace into it. A newer version
+ * Downloads and installs the update, then restarts Recastle into it. A newer version
  * may have come out since the one found, so it asks again first: otherwise, with
  * several releases in a day, one update would only lead to another.
  */
@@ -111,7 +111,7 @@ export async function installUpdate() {
       if (event.event === "Started") updates.total = event.data.contentLength ?? 0;
       if (event.event === "Progress") updates.downloaded += event.data.chunkLength;
     });
-    // Palace's own restart: on Linux it waits for this copy to close first.
+    // Recastle's own restart: on Linux it waits for this copy to close first.
     await invoke("restart_after_update");
   } catch (e) {
     updates.state = "error";

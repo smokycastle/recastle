@@ -1,7 +1,7 @@
 /** A commit's hash, short, as git.rs's short_id: "95d90e0". */
 export const shortHash = (id) => id.slice(0, 7);
 
-/** The name of the folder or file at `path`, its last part: "palace" for "/code/palace/". */
+/** The name of the folder or file at `path`, its last part: "recastle" for "/code/recastle/". */
 export const folderName = (path) => path.split(/[\\/]/).filter(Boolean).pop() ?? path;
 
 // A file size for people to read, such as "12.3 KB".

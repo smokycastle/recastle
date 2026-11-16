@@ -7,7 +7,7 @@ test("the program a command runs is its first word after any settings", () => {
   expect(programOf("")).toBe("");
 });
 
-test("each agent Palace knows starts on the task in $RECASTLE_TASK, its own way", () => {
+test("each agent Recastle knows starts on the task in $RECASTLE_TASK, its own way", () => {
   expect(taskCommand("claude")).toBe('claude -- "$RECASTLE_TASK"');
   expect(taskCommand("codex")).toBe('codex -- "$RECASTLE_TASK"');
   // Gemini CLI stays open after it only with -i.
@@ -31,7 +31,7 @@ test("a command that's more than one, where the task could go to another, takes 
   }
 });
 
-test("a command that resumes a session, or that Palace doesn't know, takes no task", () => {
+test("a command that resumes a session, or that Recastle doesn't know, takes no task", () => {
   expect(taskCommand("claude --resume")).toBeNull();
   expect(taskCommand("claude -c")).toBeNull();
   expect(taskCommand("codex resume")).toBeNull();

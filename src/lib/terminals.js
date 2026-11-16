@@ -79,7 +79,7 @@ export async function offerInstall(path, agent, { then, repositoryCommand = true
     message: [
       `${agent.name} tabs run ${agent.title}, which isn't installed here yet. Its installer, for macOS and Linux, is:`,
       agent.install,
-      `Palace can type it into a terminal for you to run. Other ways to install it are at ${agent.setup}. Once it's installed, ${then ?? `open a ${agent.name} tab again`}.`,
+      `Recastle can type it into a terminal for you to run. Other ways to install it are at ${agent.setup}. Once it's installed, ${then ?? `open a ${agent.name} tab again`}.`,
       repositoryCommand && "To use another agent instead, change the agent command in the terminal panel's ⋯ menu.",
     ]
       .filter(Boolean)
@@ -91,7 +91,7 @@ export async function offerInstall(path, agent, { then, repositoryCommand = true
 }
 
 /**
- * The agent `command` runs, among those Palace knows, when it isn't installed here, or
+ * The agent `command` runs, among those Recastle knows, when it isn't installed here, or
  * null: installed, or a command that's the shell's to run, such as "cd api && claude"
  * or an alias, which isn't checked.
  */
@@ -103,7 +103,7 @@ export async function missingAgent(command) {
 
 // --- Colors -----------------------------------------------------------------------
 
-// The 16 colors programs choose from, readable on Palace's light and dark backgrounds.
+// The 16 colors programs choose from, readable on Recastle's light and dark backgrounds.
 const ANSI = {
   light: {
     black: "#24292f",
@@ -300,7 +300,7 @@ export async function sendToAgent(path, text, { wanted = () => true } = {}) {
 /**
  * Starts the repository's agent on `task`, as New Agent Task does, and resolves to how:
  * "started", given it as it starts (see taskCommand), so it's working at once; "pasted",
- * put in its prompt for the user to send, for an agent Palace can't give one to that way;
+ * put in its prompt for the user to send, for an agent Recastle can't give one to that way;
  * { missing: agent }, not installed here; or null, when that agent never started, or
  * `wanted()` says it's no longer wanted, as its tab's closed while it was looked for.
  */
@@ -381,7 +381,7 @@ function checkFront(tab) {
 const RUNTIME = "node";
 
 /**
- * Which agent Palace offers is in front in the tab, as far as it can tell, or null:
+ * Which agent Recastle offers is in front in the tab, as far as it can tell, or null:
  * the one the program in front is, or where that's node, which one could run as, or
  * not known, the one the tab was opened for. Started by hand in a terminal tab, it's
  * known where it runs as itself, as Claude Code does.
@@ -435,7 +435,7 @@ export function copySelection(tab) {
 /**
  * Files dropped on the terminal: their paths are typed, as in Terminal.app, so an agent
  * such as Claude Code takes a dropped image. Where the web view won't say where a file
- * is, as WebKit on macOS may not, it's a copy Palace saves (see drop.rs).
+ * is, as WebKit on macOS may not, it's a copy Recastle saves (see drop.rs).
  */
 export async function dropFiles(tab, transfer) {
   const uris = (transfer.getData("text/uri-list") || "").split(/\r?\n/).filter((line) => line.startsWith("file://"));
@@ -541,7 +541,7 @@ function onKey(tab, event) {
   if (event.type !== "keydown") return true;
   // Typing in it is looking at it.
   markTabSeen(tab);
-  // Where an agent Palace knows is running, Shift+Enter starts a new line in its prompt
+  // Where an agent Recastle knows is running, Shift+Enter starts a new line in its prompt
   // instead of sending it, typing what that agent takes for one (see AGENTS). Elsewhere
   // it's Enter, as other programs expect.
   if (event.key === "Enter" && event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
@@ -661,7 +661,7 @@ export function markSeen() {
 }
 
 // Seen, its notifications are done with: on Linux they're withdrawn from the desktop's
-// list, and so from the count on Palace's icon in the dock (see notify.rs).
+// list, and so from the count on Recastle's icon in the dock (see notify.rs).
 function markTabSeen(tab) {
   if (!tab.unseen) return;
   tab.unseen = false;
@@ -739,17 +739,17 @@ async function notify(path, tab, record) {
   const text = describe(record, agent, folderName(path), since ? now - since : null);
   if (!text) return;
   const body = text.body || tab.title;
-  // In a Palace window, which may be another, it's a notice there that can bring the tab
-  // forward. macOS wouldn't show the system's while Palace is in front, anyway.
+  // In a Recastle window, which may be another, it's a notice there that can bring the tab
+  // forward. macOS wouldn't show the system's while Recastle is in front, anyway.
   const notice = { path, key: tab.key, state: record.state, title: text.title, body };
   if (await invoke("show_notice", { notice }).catch(() => false)) return;
-  // On macOS, not before Palace knows it runs from its app bundle: asked from `tauri dev`,
+  // On macOS, not before Recastle knows it runs from its app bundle: asked from `tauri dev`,
   // the notification center brings the process down.
   allowed ??= invoke("can_notify")
     .then((can) => can && isPermissionGranted().then((granted) => granted || requestPermission().then((answer) => answer === "granted")))
     .catch(() => false);
   if (!(await allowed)) return;
-  // On Linux, Palace sends it itself, to raise the window with the token the desktop
+  // On Linux, Recastle sends it itself, to raise the window with the token the desktop
   // gives with a click (see notify.rs).
   if (!isMac && (await invoke("notify_tab", { title: text.title, body: plain(body), path, key: tab.key }).then(() => true, () => false))) return;
   // Listening first: only a notification sent while something listens reports a click.

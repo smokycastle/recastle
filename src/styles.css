@@ -1,4 +1,4 @@
-/* The sizes Palace's styles choose from, so a new one fits with the rest rather than
+/* The sizes Recastle's styles choose from, so a new one fits with the rest rather than
    picking its own. Text: --font-ui is most of the interface, the steps around it
    captions and labels below, titles above; a heading bigger than these is a one-off,
    set where it's used. Corners: rounder for bigger things, and a little less round
@@ -921,7 +921,7 @@ body.dragging-row * {
   color: var(--text-primary);
 }
 
-/* Code GitHub has highlighted, in Palace's syntax colors (see above). */
+/* Code GitHub has highlighted, in Recastle's syntax colors (see above). */
 .markdown .pl-c {
   color: var(--syntax-comment);
   font-style: italic;

@@ -1,4 +1,4 @@
-// Lists the open-source projects that go into Palace, with their licenses, for
+// Lists the open-source projects that go into Recastle, with their licenses, for
 // Settings › Acknowledgments: the npm packages the app ships, the Material Icon Theme
 // icons, and the Rust crates compiled into it for this platform (not those only used
 // to build it, such as build scripts and macros). Writes src/lib/acknowledgments.json,
@@ -109,7 +109,7 @@ function crates() {
   const nodes = new Map(metadata.resolve.nodes.map((n) => [n.id, n]));
   const isMacro = (p) => p.targets.some((t) => t.kind.includes("proc-macro"));
 
-  // What the app's binary links: normal dependencies, from Palace down, leaving out
+  // What the app's binary links: normal dependencies, from Recastle down, leaving out
   // build and dev dependencies and macros, which only run while it's built.
   const included = new Set();
   const queue = [metadata.resolve.root];

@@ -1,5 +1,5 @@
-//! Palace's windows, side by side, each with repositories open in tabs of its own. As
-//! Palace starts, it reopens the windows it had, with their tabs (see reopen.rs), or
+//! Recastle's windows, side by side, each with repositories open in tabs of its own. As
+//! Recastle starts, it reopens the windows it had, with their tabs (see reopen.rs), or
 //! with none noted, the first, "main", with the last repository; New Window opens
 //! another, to choose one in. A repository is open in one tab at a time: opening it
 //! again shows that tab, and its window.
@@ -61,7 +61,7 @@ const CASCADE: f64 = 28.0;
 #[derive(Serialize)]
 pub struct Start {
     /// The tabs this window had, as when its page reloads, or is to open, as one
-    /// reopened after Palace restarts itself.
+    /// reopened after Recastle restarts itself.
     tabs: Tabs,
     /// Whether it's the first window, which reopens the last repository at startup.
     first: bool,
@@ -242,7 +242,7 @@ fn gone(path: &std::path::Path) -> bool {
     not_found && above.is_some_and(|above| above.is_dir())
 }
 
-/// Shows `notice`, that a terminal in `window` finished or needs the user, in the Palace
+/// Shows `notice`, that a terminal in `window` finished or needs the user, in the Recastle
 /// window the user is in, which may be `window` itself, and says whether there was one.
 /// There isn't when another app is in front: then the system's notification says it.
 #[tauri::command]
@@ -279,7 +279,7 @@ pub(crate) struct TerminalTab {
 }
 
 /// Opens a new window, a little below and to the right of `window`, with a tab to
-/// choose a repository in. `dark` is the theme Palace is showing, which the window takes
+/// choose a repository in. `dark` is the theme Recastle is showing, which the window takes
 /// from the start: otherwise it shows white until its page has loaded and turned it
 /// dark.
 #[tauri::command]
@@ -302,7 +302,7 @@ pub(crate) fn make<'a>(
     tabs: Tabs,
     dark: bool,
 ) -> Result<(String, WebviewWindowBuilder<'a, Wry, AppHandle>), String> {
-    let mut config = app.config().app.windows.first().cloned().ok_or("Palace has no window settings.")?;
+    let mut config = app.config().app.windows.first().cloned().ok_or("Recastle has no window settings.")?;
     config.label = format!("window-{}", NEXT.fetch_add(1, Ordering::Relaxed));
     let theme = if dark { Theme::Dark } else { Theme::Light };
     let builder = WebviewWindowBuilder::from_config(app, &config)
@@ -328,7 +328,7 @@ pub(crate) fn tabs_in(app: &AppHandle, window: &str) -> Tabs {
 }
 
 /// Has the window labeled `window` open `tabs` as its page starts (see window_start),
-/// as one does with those it had before Palace restarted (see reopen.rs), or a new one
+/// as one does with those it had before Recastle restarted (see reopen.rs), or a new one
 /// with none. Its page notes them again as they open, leaving out any it couldn't,
 /// so none stands for a repository that isn't showing.
 pub(crate) fn start_with(windows: &Windows, window: &str, tabs: Tabs) {
@@ -354,7 +354,7 @@ pub(crate) fn show_themed(window: &WebviewWindow, theme: Option<Theme>) {
     let _ = window.set_focus();
 }
 
-/// Shows the first window, which opens with Palace, in the theme its settings choose,
+/// Shows the first window, which opens with Recastle, in the theme its settings choose,
 /// so it isn't light until its page has loaded them and turned it dark. Returns that
 /// theme, None for the system's, and whether it's dark, for other windows opening now.
 pub(crate) fn show_first(window: &WebviewWindow) -> (Option<Theme>, bool) {
@@ -364,7 +364,7 @@ pub(crate) fn show_first(window: &WebviewWindow) -> (Option<Theme>, bool) {
     (theme, dark)
 }
 
-/// The theme Palace's settings choose, or None for the system's, and whether it's dark,
+/// The theme Recastle's settings choose, or None for the system's, and whether it's dark,
 /// as the system's is for `window`.
 fn saved_theme(app: &AppHandle, window: &WebviewWindow) -> (Option<Theme>, bool) {
     let theme = match crate::store::saved_theme(app).as_deref() {
@@ -432,7 +432,7 @@ mod tests {
         let here = t.dir.to_string_lossy().into_owned();
         let deleted = t.dir.join("deleted").to_string_lossy().into_owned();
         let on_a_drive = t.dir.join("drive").join("project").to_string_lossy().into_owned();
-        let a_drive = "/Volumes/Palace Test Drive Not Connected".to_string();
+        let a_drive = "/Volumes/Recastle Test Drive Not Connected".to_string();
         let gone = tauri::async_runtime::block_on(folders_gone(vec![here, deleted.clone(), on_a_drive, a_drive]));
         assert_eq!(gone, [deleted]);
     }

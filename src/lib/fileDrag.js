@@ -1,6 +1,6 @@
-// Files dragged in from outside Palace, as from the desktop or a file manager. WebKit on
+// Files dragged in from outside Recastle, as from the desktop or a file manager. WebKit on
 // macOS says so with "Files" among what's dragged; WebKitGTK on Linux, while they're
-// dragged, lists only "text/uri-list", the files' addresses. Palace's own drags carry
+// dragged, lists only "text/uri-list", the files' addresses. Recastle's own drags carry
 // neither.
 //
 // Where they're dropped differs too. On macOS the page has the drop, with the files'
@@ -12,7 +12,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-/** Whether `transfer`, a drag's dataTransfer, carries files from outside Palace. */
+/** Whether `transfer`, a drag's dataTransfer, carries files from outside Recastle. */
 export function draggingFiles(transfer) {
   if (!transfer) return false;
   const types = Array.from(transfer.types ?? []);

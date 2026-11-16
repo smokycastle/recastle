@@ -24,10 +24,10 @@ vi.mock("./overlays.js", () => ({
 // A repository's overview, with `main` checked out and nothing else unless asked for.
 function repo(parts = {}) {
   return {
-    path: "/code/palace",
+    path: "/code/recastle",
     head: { branch: "main" },
     branches: [{ name: "main", is_head: true, upstream: "origin/main", worktree: null }],
-    remotes: [{ name: "origin", url: "https://github.com/o/palace.git", branches: ["main"] }],
+    remotes: [{ name: "origin", url: "https://github.com/o/recastle.git", branches: ["main"] }],
     tags: [],
     worktrees: [],
     operation: null,
@@ -61,8 +61,8 @@ beforeEach(() => {
   vi.mocked(openPullDialog).mockReset();
 });
 
-// The branches' arrangement is kept for all of Palace, so each test's goes.
-afterEach(() => resetOrder("/code/palace"));
+// The branches' arrangement is kept for all of Recastle, so each test's goes.
+afterEach(() => resetOrder("/code/recastle"));
 
 describe("a branch's menu", () => {
   test("for the current branch, offers neither merging it into itself nor deleting it", () => {
@@ -90,14 +90,14 @@ describe("a branch's menu", () => {
 
   test("for one checked out in another worktree, opens that instead, and can't delete it", () => {
     const { actions, openWorktree } = actionsOn({
-      branches: [branch("main", { is_head: true }), branch("feature", { worktree: "/code/palace-feature" })],
+      branches: [branch("main", { is_head: true }), branch("feature", { worktree: "/code/recastle-feature" })],
     });
     const menu = actions.branchMenu("feature");
     expect(labels(menu)).not.toContain("Check Out");
     expect(labels(menu)).not.toContain("New Worktree…");
     expect(item(menu, "Delete…").disabled).toBe(true);
-    item(menu, "Open Worktree “palace-feature”").action();
-    expect(openWorktree).toHaveBeenCalledWith("/code/palace-feature");
+    item(menu, "Open Worktree “recastle-feature”").action();
+    expect(openWorktree).toHaveBeenCalledWith("/code/recastle-feature");
   });
 
   test("offers to publish a branch without an upstream, where there's a remote to", () => {
@@ -187,10 +187,10 @@ describe("once another repository's opened in the tab as an operation runs", () 
 
   test("the branches' arrangement changes in the repository it ran in", async () => {
     const { actions } = switchedDuring("delete_merged_branch");
-    addDivider("/code/palace", "", null, ["branch:feature"]);
+    addDivider("/code/recastle", "", null, ["branch:feature"]);
     addDivider("/code/other", "", null, ["branch:feature"]);
     await actions.deleteMergedBranch("feature", "abc123");
-    expect(branchOrder("/code/palace")).not.toContain("branch:feature");
+    expect(branchOrder("/code/recastle")).not.toContain("branch:feature");
     expect(branchOrder("/code/other")).toContain("branch:feature");
   });
 });
@@ -250,7 +250,7 @@ describe("pulling", () => {
 describe("worktrees", () => {
   // As the backend lists them (see worktree.rs), every field there.
   const worktree = (path, more = {}) => ({ path, branch: null, main: false, current: false, locked: false, prunable: false, ...more });
-  const main = worktree("/code/palace", { branch: "main", main: true, current: true });
+  const main = worktree("/code/recastle", { branch: "main", main: true, current: true });
 
   test("a new one goes beside the repository, named after it and the branch, and opens", async () => {
     const { actions, ran, openWorktree } = actionsOn({ worktrees: [main] });
@@ -258,20 +258,20 @@ describe("worktrees", () => {
     await actions.newWorktree();
     expect(vi.mocked(openForm).mock.calls[0][0].fields.find((f) => f.key === "location").value).toBe("/code");
     expect(ran()).toEqual([
-      ["add_worktree", { folder: "/code/palace-feature-login", branch: "main", create: "feature/login", remote: false }],
+      ["add_worktree", { folder: "/code/recastle-feature-login", branch: "main", create: "feature/login", remote: false }],
     ]);
-    expect(openWorktree).toHaveBeenCalledWith("/code/palace-feature-login");
+    expect(openWorktree).toHaveBeenCalledWith("/code/recastle-feature-login");
   });
 
   test("one for a remote branch with a local branch of its name uses the local one", async () => {
     const { actions, ran } = actionsOn({ worktrees: [main], branches: [branch("main", { is_head: true }), branch("next")] });
     vi.mocked(openForm).mockResolvedValue({ location: "/code", open: false });
     await actions.newWorktree({ branch: "origin/next", remote: true });
-    expect(ran()).toEqual([["add_worktree", { folder: "/code/palace-next", branch: "next", create: null, remote: false }]]);
+    expect(ran()).toEqual([["add_worktree", { folder: "/code/recastle-next", branch: "next", create: null, remote: false }]]);
   });
 
   test("removing one open in a tab says what stops there, and closes it", async () => {
-    const other = worktree("/code/palace-feature", { branch: "feature" });
+    const other = worktree("/code/recastle-feature", { branch: "feature" });
     const { actions, ran } = actionsOn({ worktrees: [main, other] });
     vi.mocked(invoke).mockImplementation(async (command) =>
       command === "worktree_has_changes" ? false : { open: true, programs: ["claude"], edits: [] },
@@ -285,7 +285,7 @@ describe("worktrees", () => {
   });
 
   test("removing one a tab showed before says its terminals there stop, and the tab stays", async () => {
-    const other = worktree("/code/palace-feature", { branch: "feature" });
+    const other = worktree("/code/recastle-feature", { branch: "feature" });
     const { actions, ran } = actionsOn({ worktrees: [main, other] });
     vi.mocked(invoke).mockImplementation(async (command) =>
       command === "worktree_has_changes" ? false : { open: false, programs: ["npm"], edits: [] },
@@ -298,7 +298,7 @@ describe("worktrees", () => {
   });
 
   test("removing one forgets the agent command New Agent Task gave it", async () => {
-    const other = worktree("/code/palace-feature", { branch: "feature" });
+    const other = worktree("/code/recastle-feature", { branch: "feature" });
     setAgentCommand(other.path, "codex");
     const { actions } = actionsOn({ worktrees: [main, other] });
     vi.mocked(askConfirm).mockResolvedValue(true);
@@ -307,7 +307,7 @@ describe("worktrees", () => {
   });
 
   test("removing one with changes forces it, once that's been said", async () => {
-    const other = worktree("/code/palace-feature", { branch: "feature" });
+    const other = worktree("/code/recastle-feature", { branch: "feature" });
     const { actions, ran } = actionsOn({ worktrees: [main, other] });
     vi.mocked(invoke).mockImplementation(async (command) => (command === "worktree_has_changes" ? true : null));
     vi.mocked(askConfirm).mockResolvedValue(true);
@@ -317,46 +317,46 @@ describe("worktrees", () => {
   });
 
   test("the repository's own, and the one showing, can't be removed", () => {
-    const other = worktree("/code/palace-feature", { branch: "feature", current: true });
+    const other = worktree("/code/recastle-feature", { branch: "feature", current: true });
     const { actions } = actionsOn({ worktrees: [{ ...main, current: false }, other] });
     expect(labels(actions.worktreeMenu(main.path))).not.toContain("Remove…");
     expect(item(actions.worktreeMenu(other.path), "Remove…").disabled).toBe(true);
   });
 
   test("arranges the repository's branches from any of its worktrees alike", async () => {
-    const other = worktree("/code/palace-feature", { branch: "feature", current: true });
+    const other = worktree("/code/recastle-feature", { branch: "feature", current: true });
     const { actions } = actionsOn({ path: other.path, worktrees: [{ ...main, current: false }, other] });
     vi.mocked(openForm).mockResolvedValue({ label: "" });
     await item(actions.branchMenu("main"), "Add Divider Below…").action();
-    expect(branchOrder("/code/palace")).toEqual(["branch:main", expect.stringMatching(/^branch-divider:/)]);
+    expect(branchOrder("/code/recastle")).toEqual(["branch:main", expect.stringMatching(/^branch-divider:/)]);
     expect(branchOrder(other.path)).toEqual([]);
   });
 
   test("Prune shows only when a worktree's folder is gone", () => {
-    const gone = worktree("/code/palace-old", { prunable: true });
+    const gone = worktree("/code/recastle-old", { prunable: true });
     expect(labels(actionsOn({ worktrees: [main] }).actions.sectionMenu("worktrees"))).not.toContain("Prune Worktrees");
     expect(labels(actionsOn({ worktrees: [main, gone] }).actions.sectionMenu("worktrees"))).toContain("Prune Worktrees");
   });
 });
 
 describe("a new task", () => {
-  const main = { path: "/code/palace", branch: "main", main: true, current: true, locked: false, prunable: false };
+  const main = { path: "/code/recastle", branch: "main", main: true, current: true, locked: false, prunable: false };
 
   test("starts on a branch named after it, beside the repository, in a window of its own", async () => {
     const { actions, ran, openWorktree } = actionsOn({ worktrees: [main], branches: [branch("main", { is_head: true }), branch("fix-the-login-bug")] });
     vi.mocked(openForm).mockResolvedValue({ task: " Fix the login bug ", name: "", location: "/code" });
     await actions.newTask();
     expect(ran()).toEqual([
-      ["add_worktree", { folder: "/code/palace-fix-the-login-bug-2", branch: "main", create: "fix-the-login-bug-2", remote: false }],
+      ["add_worktree", { folder: "/code/recastle-fix-the-login-bug-2", branch: "main", create: "fix-the-login-bug-2", remote: false }],
     ]);
-    expect(openWorktree).toHaveBeenCalledWith("/code/palace-fix-the-login-bug-2", { task: "Fix the login bug" });
+    expect(openWorktree).toHaveBeenCalledWith("/code/recastle-fix-the-login-bug-2", { task: "Fix the login bug" });
   });
 
   test("takes the branch name given", async () => {
     const { actions, ran } = actionsOn({ worktrees: [main] });
     vi.mocked(openForm).mockResolvedValue({ task: "Anything", name: " feature/search ", location: "/code" });
     await actions.newTask();
-    expect(ran()[0][1]).toMatchObject({ folder: "/code/palace-feature-search", create: "feature/search" });
+    expect(ran()[0][1]).toMatchObject({ folder: "/code/recastle-feature-search", create: "feature/search" });
   });
 
   test("starts nothing when canceled, or when the worktree couldn't be made", async () => {
@@ -386,7 +386,7 @@ describe("a new task", () => {
     const { actions } = actionsOn({ worktrees: [main] });
     vi.mocked(openForm).mockResolvedValue({ task: "Anything", name: "agent-task", location: "/code" });
     await actions.newTask();
-    expect(agentCommand("/code/palace-agent-task")).toBe("codex --full-auto");
+    expect(agentCommand("/code/recastle-agent-task")).toBe("codex --full-auto");
     setAgentCommand(repo().path, "");
   });
 

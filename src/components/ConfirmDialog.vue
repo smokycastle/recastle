@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref } from "vue";
 import { closeConfirm } from "../lib/overlays.js";
 
-// Asks before doing something, in the same style as Palace's other dialogs.
+// Asks before doing something, in the same style as Recastle's other dialogs.
 const props = defineProps({
   // { title, message, confirmLabel, danger }
   dialog: { type: Object, required: true },
@@ -28,7 +28,7 @@ function onKeydown(event) {
   <div class="backdrop" @mousedown.self="closeConfirm(false)" @keydown="onKeydown">
     <form class="dialog" role="alertdialog" @submit.prevent="closeConfirm(true)">
       <header>
-        <img src="/palace.svg" alt="" class="app-icon" />
+        <img src="/recastle.svg" alt="" class="app-icon" />
         <div>
           <h2>{{ dialog.title }}</h2>
           <p v-for="(paragraph, i) in paragraphs" :key="i">{{ paragraph }}</p>

@@ -50,7 +50,7 @@ const thisWindow = getCurrentWebviewWindow();
 
 // --- Checks at startup -------------------------------------------------------------
 
-// Without a usable git, Palace shows how to install it instead of the app.
+// Without a usable git, Recastle shows how to install it instead of the app.
 const gitStatus = ref(null);
 const checkingGit = ref(false);
 const gitMissing = computed(() => gitStatus.value && !gitStatus.value.supported);
@@ -67,7 +67,7 @@ async function checkGit() {
   } finally {
     checkingGit.value = false;
   }
-  // With git missing, the tabs it had, as after Palace restarted into an update, are
+  // With git missing, the tabs it had, as after Recastle restarted into an update, are
   // kept, for when git's been installed and Recheck finds it.
   gitChecked.value = true;
 }
@@ -96,7 +96,7 @@ const newWindow = () =>
     tell("Couldn't Open a Window", String(e)),
   );
 
-// The File menu's items, on a Mac (see menu.rs); the Palace menu's are the workspace
+// The File menu's items, on a Mac (see menu.rs); the Recastle menu's are the workspace
 // showing's. Not while a dialog's open, which they'd go out from under. Before there are
 // tabs, as with git missing, Close Tab closes the window, as a new window's does.
 const unlistenMenu = thisWindow.listen("menu", ({ payload }) => {
@@ -157,7 +157,7 @@ unlistenAgents
 // to.
 const asking = { close: false, quit: false };
 const unlistenQuit = thisWindow.listen("quit-requested", async ({ payload }) => {
-  // Palace goes ahead anyway on a second try if the page doesn't say it's asking.
+  // Recastle goes ahead anyway on a second try if the page doesn't say it's asking.
   invoke("quit_asking").catch(() => {});
   const { quitting } = payload;
   const kind = quitting ? "quit" : "close";
@@ -188,7 +188,7 @@ const unlistenQuit = thisWindow.listen("quit-requested", async ({ payload }) => 
   // Before any other question showing: quitting otherwise seems to do nothing.
   const ok = await askConfirm({
     first: true,
-    title: quitting ? "Quit Palace?" : "Close Window?",
+    title: quitting ? "Quit Recastle?" : "Close Window?",
     message: lines.join("\n\n"),
     confirmLabel: quitting ? "Quit" : "Close",
     danger: true,

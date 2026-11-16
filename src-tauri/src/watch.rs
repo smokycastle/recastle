@@ -1,11 +1,11 @@
 //! Watches each repository a window has open and tells that window when something in it
 //! changes, saying which, so edits made in an editor or terminal show up without
-//! switching back to Palace.
+//! switching back to Recastle.
 //!
 //! Folders git ignores (vendor/, node_modules/, build output) are never watched: they
-//! change constantly, don't affect what Palace shows, and in a large project would use
+//! change constantly, don't affect what Recastle shows, and in a large project would use
 //! up the system's limit on watched folders. Ignored files and folders coming and going
-//! where Palace does watch are reported, as the Files view lists them, but not writes to
+//! where Recastle does watch are reported, as the Files view lists them, but not writes to
 //! an ignored file, such as a log.
 
 use git2::{Repository, StatusOptions};
@@ -225,7 +225,7 @@ fn watch_tree(watcher: &mut RecommendedWatcher, repo: &Repository, workdir: &Pat
     }
 }
 
-/// Whether a change at `path` could alter what Palace shows. `present` holds the ignored
+/// Whether a change at `path` could alter what Recastle shows. `present` holds the ignored
 /// files and folders known to be there (see ignored_now), kept up to date as they come
 /// and go.
 fn relevant(repo: &Repository, workdir: &Path, gitdir: &Path, common: &Path, path: &Path, present: &mut HashSet<PathBuf>) -> bool {
@@ -378,7 +378,7 @@ mod tests {
     fn an_ignored_folder_removed_and_made_again_is_reported_both_times() {
         let t = TempRepo::new("watch-ignored-again");
         t.commit(&[("a.txt", Some("a\n")), (".gitignore", Some("node_modules/\n"))], "First");
-        // As after npm install, before Palace starts watching.
+        // As after npm install, before Recastle starts watching.
         std::fs::create_dir(t.dir.join("node_modules")).unwrap();
         let (_watcher, rx) = watch(&t);
         settle(&rx);

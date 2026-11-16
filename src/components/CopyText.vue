@@ -65,7 +65,7 @@ function onKeydown(event) {
 }
 
 /* Tinted in the accent color, as something that does something when clicked, without
-   the pointer cursor the rest of Palace doesn't use for text. */
+   the pointer cursor the rest of Recastle doesn't use for text. */
 .copy-text:hover {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   color: var(--accent);

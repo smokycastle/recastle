@@ -329,7 +329,7 @@ mod tests {
 
     #[test]
     fn offering_to_create_a_repository() {
-        let dir = std::env::temp_dir().join(format!("palace-test-not-a-repository-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-not-a-repository-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.to_string_lossy().into_owned();

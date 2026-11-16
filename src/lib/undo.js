@@ -112,7 +112,7 @@ export function useUndo({ overview, run, busy, draft, settle, offer }) {
     if (!before && cover) {
       const ok = await askConfirm({
         title: `${step.label} Without Undo?`,
-        message: `Palace couldn't keep a copy of the changes to undo this with: ${reason}\n\nGo ahead anyway? It can't be undone.`,
+        message: `Recastle couldn't keep a copy of the changes to undo this with: ${reason}\n\nGo ahead anyway? It can't be undone.`,
         confirmLabel: step.label,
         danger: true,
       });

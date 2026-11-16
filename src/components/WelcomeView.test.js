@@ -3,7 +3,7 @@ import { createApp, h, nextTick } from "vue";
 import { FILTER_RECENTS } from "../lib/recents.js";
 import WelcomeView from "./WelcomeView.vue";
 
-// recents.js, for FILTER_RECENTS, reads storage.js, which listens for Palace's other windows as it loads.
+// recents.js, for FILTER_RECENTS, reads storage.js, which listens for Recastle's other windows as it loads.
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => () => {}) }));
 vi.mock("@tauri-apps/api/webviewWindow", () => ({ getCurrentWebviewWindow: () => ({ label: "main" }) }));
@@ -78,17 +78,17 @@ describe("WelcomeView", () => {
   });
 
   test("with more than FILTER_RECENTS, finds them by every word typed, and Enter opens the first", async () => {
-    const recents = [...repos(FILTER_RECENTS), { name: "palace", path: "/home/me/code/palace" }];
+    const recents = [...repos(FILTER_RECENTS), { name: "recastle", path: "/home/me/code/recastle" }];
     const { root, emitted } = show({ recents });
     const filter = root.querySelector(".recent-filter");
     expect(filter).not.toBeNull();
 
-    filter.value = "code pal";
+    filter.value = "code rec";
     filter.dispatchEvent(new Event("input"));
     await nextTick();
-    expect(rowNames(root)).toEqual(["palace"]);
+    expect(rowNames(root)).toEqual(["recastle"]);
     filter.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
-    expect(emitted).toEqual([["open", "/home/me/code/palace"]]);
+    expect(emitted).toEqual([["open", "/home/me/code/recastle"]]);
 
     filter.value = "nothing like it";
     filter.dispatchEvent(new Event("input"));

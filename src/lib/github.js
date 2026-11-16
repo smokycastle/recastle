@@ -2,9 +2,9 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { openForm } from "./overlays.js";
 
-// The GitHub account Palace is signed in with, shared by Settings and the GitHub view.
+// The GitHub account Recastle is signed in with, shared by Settings and the GitHub view.
 export const githubAccount = ref(null);
-// Whether Palace has found out yet if it's signed in, which it does as it starts.
+// Whether Recastle has found out yet if it's signed in, which it does as it starts.
 export const githubAccountChecked = ref(false);
 
 invoke("github_account")
@@ -12,12 +12,12 @@ invoke("github_account")
   .catch(() => {})
   .finally(() => (githubAccountChecked.value = true));
 
-// A new classic token with the scopes Palace uses: private repositories, workflow
+// A new classic token with the scopes Recastle uses: private repositories, workflow
 // files (pushing changes to .github/workflows), organizations, and SSH keys.
 export const NEW_TOKEN_URL =
-  "https://github.com/settings/tokens/new?description=Palace&scopes=repo,workflow,read:org,admin:public_key";
+  "https://github.com/settings/tokens/new?description=Recastle&scopes=repo,workflow,read:org,admin:public_key";
 
-// What each scope lets Palace do, for the Account tab.
+// What each scope lets Recastle do, for the Account tab.
 export const SCOPES = [
   { name: "repo", use: "Fetch, pull and push your repositories, private ones included, and create new ones" },
   { name: "workflow", use: "Push changes to GitHub Actions workflows (.github/workflows)" },
@@ -33,7 +33,7 @@ export async function signInWithToken() {
   const values = await openForm({
     title: "Sign In to GitHub",
     message:
-      "Paste a personal access token. Palace keeps it in your system keyring and uses it to fetch, pull and push your GitHub repositories.",
+      "Paste a personal access token. Recastle keeps it in your system keyring and uses it to fetch, pull and push your GitHub repositories.",
     fields: [{ key: "token", label: "Token", type: "password", placeholder: "ghp_…" }],
     confirmLabel: "Sign In",
   });

@@ -3,7 +3,7 @@
 //   node scripts/set-version.mjs 0.2.0
 //
 // The release workflow runs this with the version from the pushed tag, so a tag made
-// anywhere (in Palace, or with git) builds a release with the right version.
+// anywhere (in Recastle, or with git) builds a release with the right version.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -18,16 +18,16 @@ export const VERSION_FILES = [
 
 const PATTERNS = {
   "package.json": /("version":\s*")[^"]+(")/,
-  // Palace's own version, at the top and in its entry among the packages; npm
+  // Recastle's own version, at the top and in its entry among the packages; npm
   // install would otherwise change both to match package.json. Not a dependency's.
   "package-lock.json": [
-    /(^\{\s*"name":\s*"palace",\s*"version":\s*")[^"]+(")/,
-    /("packages":\s*\{\s*"":\s*\{\s*"name":\s*"palace",\s*"version":\s*")[^"]+(")/,
+    /(^\{\s*"name":\s*"recastle",\s*"version":\s*")[^"]+(")/,
+    /("packages":\s*\{\s*"":\s*\{\s*"name":\s*"recastle",\s*"version":\s*")[^"]+(")/,
   ],
   "src-tauri/tauri.conf.json": /("version":\s*")[^"]+(")/,
   // Only the package's own version, under [package], not a dependency's.
   "src-tauri/Cargo.toml": /(\[package\][^[]*?\nversion\s*=\s*")[^"]+(")/,
-  "src-tauri/Cargo.lock": /(\[\[package\]\]\nname = "palace"\nversion = ")[^"]+(")/,
+  "src-tauri/Cargo.lock": /(\[\[package\]\]\nname = "recastle"\nversion = ")[^"]+(")/,
 };
 
 export function setVersion(version) {

@@ -1,4 +1,4 @@
-// Prepares the file and folder icons Palace shows, from Material Icon Theme (MIT,
+// Prepares the file and folder icons Recastle shows, from Material Icon Theme (MIT,
 // https://github.com/material-extensions/vscode-material-icon-theme): copies its icons
 // to public/file-icons/, with its license, and writes src/lib/fileIconMap.json, which
 // says which icon each file name, extension and folder name gets. Runs before

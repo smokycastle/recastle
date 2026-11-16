@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
-// storage.js listens for Palace's other windows as it loads.
+// storage.js listens for Recastle's other windows as it loads.
 vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => () => {}) }));
 vi.mock("@tauri-apps/api/webviewWindow", () => ({ getCurrentWebviewWindow: () => ({ label: "main" }) }));
 vi.mock("@tauri-apps/plugin-opener", () => ({ openUrl: vi.fn() }));
@@ -18,11 +18,11 @@ beforeEach(() => {
   vi.resetModules();
   account.value = null;
   // Not starred yet; nothing else is asked of the backend.
-  vi.mocked(invoke).mockImplementation(async (command) => (command === "github_starred_palace" ? false : null));
+  vi.mocked(invoke).mockImplementation(async (command) => (command === "github_starred_recastle" ? false : null));
 });
 afterEach(() => vi.useRealTimers());
 
-// Starts Palace with `saved` already saved, signed in to GitHub, and waits as long as
+// Starts Recastle with `saved` already saved, signed in to GitHub, and waits as long as
 // it takes to ask.
 async function start(saved = {}) {
   const { writeJson, readJson } = await import("./storage.js");
@@ -33,13 +33,13 @@ async function start(saved = {}) {
   return { starRequest, readJson };
 }
 
-test("doesn't ask the first day Palace is used, and remembers when that was", async () => {
+test("doesn't ask the first day Recastle is used, and remembers when that was", async () => {
   const { starRequest, readJson } = await start();
   expect(starRequest.value).toBeNull();
   expect(readJson("recastle.firstStarted")).toBe(NOW);
 });
 
-test("asks once Palace has been in use for a day", async () => {
+test("asks once Recastle has been in use for a day", async () => {
   const { starRequest } = await start({ "recastle.firstStarted": NOW - DAY });
   expect(starRequest.value).toBe("ask");
 });
@@ -49,8 +49,8 @@ test("doesn't ask again once asked", async () => {
   expect(starRequest.value).toBeNull();
 });
 
-test("doesn't ask an account that has starred Palace already", async () => {
-  vi.mocked(invoke).mockImplementation(async (command) => command === "github_starred_palace");
+test("doesn't ask an account that has starred Recastle already", async () => {
+  vi.mocked(invoke).mockImplementation(async (command) => command === "github_starred_recastle");
   const { starRequest, readJson } = await start({ "recastle.firstStarted": NOW - DAY });
   expect(starRequest.value).toBeNull();
   expect(readJson("recastle.starAsked")).toBe(true);

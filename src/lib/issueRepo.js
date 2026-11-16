@@ -24,7 +24,7 @@ const ISSUE_REPOS_KEY = "recastle.issueRepos";
  */
 export function useIssueRepo({ overview, isIssues, isPulls, onChange }) {
   const issueRemotes = computed(() => githubRemotes(overview.value));
-  // Issues and Pull Requests are in the sidebar for repositories on GitHub, unless Palace
+  // Issues and Pull Requests are in the sidebar for repositories on GitHub, unless Recastle
   // is signed out of GitHub. Until it knows, they stay, rather than flicker as it starts.
   const showsIssues = computed(() => issueRemotes.value.length > 0 && (!!githubAccount.value || !githubAccountChecked.value));
   // The fork's parent as { owner, repo }; null when it isn't a fork, and undefined until

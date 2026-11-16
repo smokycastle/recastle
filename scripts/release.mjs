@@ -1,6 +1,6 @@
 // Prepares a release from the command line: sets the version everywhere it's
 // recorded, commits, and tags. Pushing the tag then has GitHub build and publish the
-// packages. (Tagging in Palace works too; the workflow takes the version from the tag.)
+// packages. (Tagging in Recastle works too; the workflow takes the version from the tag.)
 //
 //   npm run release -- 0.2.0       an exact version
 //   npm run release -- patch       0.1.0 → 0.1.1 (also: minor, major)
@@ -39,7 +39,7 @@ git("commit", "--quiet", "--message", `Release v${next}`);
 // The workflow puts the tag's message on the release as its notes. "verbatim" keeps
 // lines starting with "#", which git would otherwise drop as comments.
 if (notes) git("tag", "--annotate", "--cleanup=verbatim", `v${next}`, "--file", notes);
-else git("tag", "--annotate", `v${next}`, "--message", `Palace v${next}`);
+else git("tag", "--annotate", `v${next}`, "--message", `Recastle v${next}`);
 
 console.log(`Prepared v${next} (was ${current}). Publish it with:\n\n  git push --follow-tags\n`);
 

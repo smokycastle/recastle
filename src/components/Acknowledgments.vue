@@ -3,7 +3,7 @@ import { computed, ref, shallowRef } from "vue";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { ChevronDown, ChevronRight, ExternalLink, Search, X } from "lucide-vue-next";
 
-// The open-source projects Palace is made with (see scripts/acknowledgments.mjs),
+// The open-source projects Recastle is made with (see scripts/acknowledgments.mjs),
 // behind a button: their names in columns, families of packages, such as
 // @codemirror/* or tauri-*, as one, and a project's license on clicking it. Loaded
 // the first time they're shown.
@@ -73,7 +73,7 @@ const TITLES = { App: "The app", Backend: "Behind it" };
 
 <template>
   <div class="acknowledgments">
-    <p class="intro">Palace is made with open-source projects. Thank you to everyone who works on them.</p>
+    <p class="intro">Recastle is made with open-source projects. Thank you to everyone who works on them.</p>
     <button class="secondary-button toggle" @click="toggle">
       <component :is="shown ? ChevronDown : ChevronRight" :size="14" />
       {{ shown ? "Hide the projects" : "Show the projects and their licenses" }}

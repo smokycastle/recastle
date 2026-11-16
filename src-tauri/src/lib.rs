@@ -80,7 +80,7 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            about::about_palace,
+            about::about_recastle,
 
             avatars::github_avatars,
 
@@ -128,8 +128,8 @@ pub fn run() {
             github::github_owners,
             github::github_repos,
             github::github_scopes,
-            github::github_starred_palace,
-            github::github_star_palace,
+            github::github_starred_recastle,
+            github::github_star_recastle,
             github::github_create_repo,
             github::github_keys,
             github::github_add_key,
@@ -279,8 +279,8 @@ pub fn run() {
         .expect("error while building tauri application")
         .run(|app, event| match event {
             // Quitting, or closing a window, with programs running in terminals or edits
-            // not saved asks first; see quit.rs. On a Mac, Quit is Palace's own menu item,
-            // which asks as this does (see menu.rs). Not when Palace quits itself, as to
+            // not saved asks first; see quit.rs. On a Mac, Quit is Recastle's own menu item,
+            // which asks as this does (see menu.rs). Not when Recastle quits itself, as to
             // restart into an update, which gives a code.
             tauri::RunEvent::ExitRequested { code: None, api, .. } if quit::hold(app, None) => api.prevent_exit(),
             // Quitting after all: its windows are noted, to reopen as it next starts. And as
@@ -292,7 +292,7 @@ pub fn run() {
             {
                 api.prevent_close()
             }
-            // Closing: once every window is, they're noted, as Palace quits with them.
+            // Closing: once every window is, they're noted, as Recastle quits with them.
             tauri::RunEvent::WindowEvent { label, event: tauri::WindowEvent::CloseRequested { .. }, .. } => reopen::closing(app, &label),
             tauri::RunEvent::WindowEvent { label, event: tauri::WindowEvent::Destroyed, .. } => {
                 reopen::closed(&label);
@@ -302,7 +302,7 @@ pub fn run() {
         });
 }
 
-/// Runs Palace as git's credential helper instead of as the app; see `github`.
+/// Runs Recastle as git's credential helper instead of as the app; see `github`.
 pub fn git_credential(action: Option<&str>) -> i32 {
     github::credential_helper(action)
 }

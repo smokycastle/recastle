@@ -39,7 +39,7 @@ export default [
           message: "Watch several values as watch([() => a, () => b], …), which compares each one, not with a getter that returns a new array.",
         },
       ],
-      // Palace's single-file components are named for what they are, as Sidebar.
+      // Recastle's single-file components are named for what they are, as Sidebar.
       "vue/multi-word-component-names": "off",
     },
   },

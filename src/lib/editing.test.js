@@ -7,10 +7,10 @@ const { buffers, forgetEditsIn, keyFor, markUnsaved, unsavedFiles } = await impo
 
 beforeEach(() => vi.mocked(invoke).mockClear());
 
-test("Palace is told the files with edits not saved, each with the repository it's in", () => {
-  markUnsaved("/code/palace", "src/App.vue", true);
-  expect(vi.mocked(invoke).mock.calls.at(-1)).toEqual(["set_unsaved_edits", { files: [{ path: "/code/palace", described: "“App.vue” in palace" }] }]);
-  markUnsaved("/code/palace", "src/App.vue", false);
+test("Recastle is told the files with edits not saved, each with the repository it's in", () => {
+  markUnsaved("/code/recastle", "src/App.vue", true);
+  expect(vi.mocked(invoke).mock.calls.at(-1)).toEqual(["set_unsaved_edits", { files: [{ path: "/code/recastle", described: "“App.vue” in recastle" }] }]);
+  markUnsaved("/code/recastle", "src/App.vue", false);
 });
 
 test("a repository's tab closing lets go of its edits not saved, and no other's", () => {

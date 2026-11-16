@@ -27,9 +27,9 @@ import { CHANGED_ON_DISK, isError } from "../lib/errors.js";
 
 // A file from the working copy, to read and edit. Edits that aren't saved stay with
 // their file (see editing.js) while you look at another, and the file is checked
-// against the disk whenever Palace refreshes: unchanged text follows it, and edited
+// against the disk whenever Recastle refreshes: unchanged text follows it, and edited
 // text asks whether to reload it. With Settings › Save files automatically, edits save
-// a moment after typing stops, and on leaving the file, the editor or Palace.
+// a moment after typing stops, and on leaving the file, the editor or Recastle.
 const props = defineProps({
   path: { type: String, required: true },
   file: { type: String, default: null },
@@ -95,7 +95,7 @@ function goToLine() {
   if (view) cm.goToLine(view);
 }
 
-// Text Palace shows, editable or, when too large to edit, read-only.
+// Text Recastle shows, editable or, when too large to edit, read-only.
 const TEXT = ["text", "read_only"];
 const isText = computed(() => TEXT.includes(contents.value?.kind));
 const isSvg = computed(() => /\.svg$/i.test(props.file ?? ""));
@@ -128,7 +128,7 @@ function showText() {
   view?.focus();
 }
 
-// Links open in the browser rather than in Palace's window; others go nowhere.
+// Links open in the browser rather than in Recastle's window; others go nowhere.
 function onPreviewClick(event) {
   const anchor = event.target.closest?.("a[href]");
   if (!anchor) return;
@@ -324,7 +324,7 @@ function save() {
 }
 
 // Saving automatically: a moment after typing stops, and on leaving the editor or
-// Palace. Not while the file has changed on disk, until Reload or Keep Mine says
+// Recastle. Not while the file has changed on disk, until Reload or Keep Mine says
 // which to keep.
 function autosave() {
   clearTimeout(autosaveTimer);
@@ -535,7 +535,7 @@ function openInEditor() {
 }
 
 const NOT_EDITABLE = {
-  binary: "This file isn't text Palace can edit.",
+  binary: "This file isn't text Recastle can edit.",
   too_large: "This file is too large to show here.",
 };
 

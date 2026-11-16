@@ -1,7 +1,7 @@
 //! The macOS menu bar: the system's usual menus, as Tauri's default has them, with
-//! Palace's own where it differs.
+//! Recastle's own where it differs.
 //!
-//! - The Palace menu's About Palace and Check for Updates… open Palace's own page for
+//! - The Recastle menu's About Recastle and Check for Updates… open Recastle's own page for
 //!   them, the top of Settings, rather than the system's About panel, which can't check
 //!   for updates or link anywhere.
 //! - The File menu works on tabs: New Tab (⌘T) and Close Tab (⌘W), beside New Window
@@ -26,12 +26,12 @@ const CLOSE_WINDOW: &str = "close-window";
 const QUIT: &str = "quit";
 
 pub fn set(app: &AppHandle) -> tauri::Result<()> {
-    let palace = Submenu::with_items(
+    let recastle = Submenu::with_items(
         app,
-        "Palace",
+        "Recastle",
         true,
         &[
-            &MenuItem::with_id(app, ABOUT, "About Palace", true, None::<&str>)?,
+            &MenuItem::with_id(app, ABOUT, "About Recastle", true, None::<&str>)?,
             &MenuItem::with_id(app, CHECK_FOR_UPDATES, "Check for Updates…", true, None::<&str>)?,
             &PredefinedMenuItem::separator(app)?,
             &PredefinedMenuItem::services(app, None)?,
@@ -40,10 +40,10 @@ pub fn set(app: &AppHandle) -> tauri::Result<()> {
             &PredefinedMenuItem::hide_others(app, None)?,
             &PredefinedMenuItem::show_all(app, None)?,
             &PredefinedMenuItem::separator(app)?,
-            // Palace's own, not the system's, which quits at once: with programs running in
-            // terminals or edits not saved, Palace asks first, and notes its windows to
+            // Recastle's own, not the system's, which quits at once: with programs running in
+            // terminals or edits not saved, Recastle asks first, and notes its windows to
             // reopen (see quit.rs, reopen.rs).
-            &MenuItem::with_id(app, QUIT, "Quit Palace", true, Some("CmdOrCtrl+Q"))?,
+            &MenuItem::with_id(app, QUIT, "Quit Recastle", true, Some("CmdOrCtrl+Q"))?,
         ],
     )?;
     let file = Submenu::with_items(
@@ -83,7 +83,7 @@ pub fn set(app: &AppHandle) -> tauri::Result<()> {
         &[&PredefinedMenuItem::minimize(app, None)?, &PredefinedMenuItem::maximize(app, None)?],
     )?;
     let help = Submenu::with_id_and_items(app, HELP_SUBMENU_ID, "Help", true, &[])?;
-    app.set_menu(Menu::with_items(app, &[&palace, &file, &edit, &view, &window, &help])?)?;
+    app.set_menu(Menu::with_items(app, &[&recastle, &file, &edit, &view, &window, &help])?)?;
     app.on_menu_event(|app, event| {
         let id = event.id().as_ref();
         if [ABOUT, CHECK_FOR_UPDATES, NEW_TAB, NEW_WINDOW].contains(&id) {

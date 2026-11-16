@@ -2,7 +2,7 @@ import { onBeforeUnmount } from "vue";
 import { isMac } from "./platform.js";
 
 /**
- * Which of Palace's window-wide shortcuts a key press is, if any, by name, or null.
+ * Which of Recastle's window-wide shortcuts a key press is, if any, by name, or null.
  * `where` says where it was pressed and what's showing: { inTerminal, inTextField,
  * inEditor (the Files view's), dialogOpen, repository (one is open) }. On a Mac, `mac`,
  * they're Cmd; elsewhere Ctrl.
@@ -11,7 +11,7 @@ import { isMac } from "./platform.js";
  *   newTab            Cmd+T opens a tab, and newWindow, Cmd+N, a window, as in a browser;
  *                     closeTab, Cmd+W, closes the tab showing; showTab, Cmd+1 to Cmd+9,
  *                     shows that tab, Cmd+9 the last. On a Mac from a terminal too, where
- *                     Cmd keys are Palace's, while on Linux, Ctrl+T, Ctrl+N, Ctrl+W and
+ *                     Cmd keys are Recastle's, while on Linux, Ctrl+T, Ctrl+N, Ctrl+W and
  *                     the rest are the shell's there; and Ctrl+W in a text field is left
  *                     to it, as it deletes a word in some, rather than closing the tab and
  *                     what's being written with it. On a Mac, the menu's items take the
@@ -19,7 +19,7 @@ import { isMac } from "./platform.js";
  *   nextTab,          Ctrl+Tab and Ctrl+Shift+Tab, from anywhere, as in a browser, and on
  *   previousTab       a Mac, Cmd+Shift+] and Cmd+Shift+[ too.
  *   terminal          Cmd+' shows the terminal panel and goes to it, or from it, hides it.
- *                     A terminal's programs can't use it, so it's Palace's there too. By
+ *                     A terminal's programs can't use it, so it's Recastle's there too. By
  *                     the key, not the character, which needs Shift on some layouts.
  *   newTerminalTab    Cmd+Shift+T, or Ctrl+Shift+T on Linux, from anywhere: Cmd+T, as the
  *                     terminal apps have it, opens one of the window's tabs.
@@ -43,13 +43,13 @@ export function shortcutFor(event, where, mac = isMac) {
   // Cmd with a key, and no Shift or Alt.
   const alone = command && !event.shiftKey && !event.altKey;
 
-  const palaces = (mac || !inTerminal) && !dialogOpen;
+  const recastles = (mac || !inTerminal) && !dialogOpen;
   // By the letter, as N and W are, and undo's Z and Y: by where T is on a US keyboard,
   // Ctrl+Y on Dvorak, which is redo, would open a tab.
-  if (alone && key === "t" && palaces) return "newTab";
-  if (alone && key === "n" && palaces) return "newWindow";
-  if (alone && key === "w" && palaces && (mac || !inTextField)) return "closeTab";
-  if (alone && /^Digit[1-9]$/.test(event.code) && palaces) return "showTab";
+  if (alone && key === "t" && recastles) return "newTab";
+  if (alone && key === "n" && recastles) return "newWindow";
+  if (alone && key === "w" && recastles && (mac || !inTextField)) return "closeTab";
+  if (alone && /^Digit[1-9]$/.test(event.code) && recastles) return "showTab";
   const tab = event.ctrlKey && !event.metaKey && !event.altKey && event.key === "Tab";
   const bracket = mac && event.metaKey && event.shiftKey && !event.altKey && (event.code === "BracketRight" || event.code === "BracketLeft");
   if ((tab || bracket) && !dialogOpen) return (tab ? event.shiftKey : event.code === "BracketLeft") ? "previousTab" : "nextTab";

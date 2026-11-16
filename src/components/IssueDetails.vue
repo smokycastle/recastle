@@ -348,7 +348,7 @@ function state(issue) {
 // The repository's own role labels, as GitHub shows them beside a name.
 const ROLES = { OWNER: "Owner", MEMBER: "Member", COLLABORATOR: "Collaborator", CONTRIBUTOR: "Contributor" };
 
-// Links in issues open in the browser rather than in Palace's window.
+// Links in issues open in the browser rather than in Recastle's window.
 function onClick(event) {
   const link = event.target.closest?.("a[href]");
   if (!link) return;

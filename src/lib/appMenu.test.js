@@ -10,7 +10,7 @@ const stop = vi.fn();
 const window = { listen: vi.fn(async (event, handler) => ((chosen = (payload) => handler({ payload })), stop)) };
 beforeEach(() => vi.clearAllMocks());
 
-test("About Palace shows the About page, and Check for Updates checks there too", async () => {
+test("About Recastle shows the About page, and Check for Updates checks there too", async () => {
   const showAbout = vi.fn();
   const { unmount } = mountComposable(() => useAppMenu({ window, showAbout }));
   expect(window.listen).toHaveBeenCalledWith("menu", expect.any(Function));

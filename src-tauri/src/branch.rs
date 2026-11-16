@@ -374,7 +374,7 @@ fn left_part_done(repo: &Repository) -> bool {
 }
 
 /// Refuses to start a cherry-pick or revert beside another, under way or left part done:
-/// git would refuse too, and what Palace does on its way out is for its own.
+/// git would refuse too, and what Recastle does on its way out is for its own.
 fn not_under_way(path: &str) -> Result<(), String> {
     let repo = open(path)?;
     if let Some(operation) = operation(&repo) {

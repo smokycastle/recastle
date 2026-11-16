@@ -1,7 +1,7 @@
 //! Interactive rebase: rewriting the current branch's recent commits by reordering,
 //! rewording, squashing or dropping them.
 //!
-//! Palace writes git's to-do list itself and hands it over through
+//! Recastle writes git's to-do list itself and hands it over through
 //! GIT_SEQUENCE_EDITOR, so no editor opens. New messages are applied by `exec` steps
 //! that amend the commit just made, which keeps the whole rebase non-interactive.
 
@@ -132,7 +132,7 @@ pub async fn rebase_interactive(path: String, base: Option<String>, steps: Vec<S
     if now != planned {
         return Err("The branch has changed since these commits were listed. Nothing was rewritten; try again.".into());
     }
-    let work = repo.path().join("palace-rebase");
+    let work = repo.path().join("recastle-rebase");
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).map_err(|e| e.to_string())?;
 
@@ -278,7 +278,7 @@ mod tests {
         assert_eq!(log(&t, a), ["B, reworded\n\nWith a body.", "D"]);
         assert!(!t.dir.join("c.txt").exists());
         assert!(t.dir.join("b.txt").exists() && t.dir.join("d.txt").exists());
-        assert!(!t.repo.path().join("palace-rebase").exists());
+        assert!(!t.repo.path().join("recastle-rebase").exists());
     }
 
     #[test]

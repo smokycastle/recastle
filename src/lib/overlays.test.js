@@ -31,8 +31,8 @@ test("a dialog's open while one shows, the window's or a tab's own, but not a hi
 
 test("quitting's question goes before one showing, which is asked again after", async () => {
   const other = askConfirm({ title: "Discard?", message: "" });
-  const quitting = askConfirm({ title: "Quit Palace?", message: "", first: true });
-  expect(confirmDialog.value.title).toBe("Quit Palace?");
+  const quitting = askConfirm({ title: "Quit Recastle?", message: "", first: true });
+  expect(confirmDialog.value.title).toBe("Quit Recastle?");
   closeConfirm(false);
   expect(confirmDialog.value.title).toBe("Discard?");
   closeConfirm(true);

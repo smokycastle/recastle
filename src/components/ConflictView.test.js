@@ -201,7 +201,7 @@ test("resolving can be undone, the file covered, and choosing one conflict's sid
   ]);
 });
 
-test("Mark as Resolved asks first with edits in Palace's editor not saved", async () => {
+test("Mark as Resolved asks first with edits in Recastle's editor not saved", async () => {
   const { askConfirm } = await import("../lib/overlays.js");
   const { markUnsaved } = await import("../lib/editing.js");
   vi.mocked(askConfirm).mockReset().mockResolvedValue(false);
@@ -211,7 +211,7 @@ test("Mark as Resolved asks first with edits in Palace's editor not saved", asyn
   await settle();
   markUnsaved("/repo", "src/gone.txt", false);
   expect(vi.mocked(askConfirm).mock.calls[0][0].message).toContain(
-    "edits in Palace's editor that aren't saved",
+    "edits in Recastle's editor that aren't saved",
   );
 });
 

@@ -28,14 +28,14 @@ const DEFAULTS = {
   // each kind with the names on hover (see refBadges.js).
   historyRefNames: false,
   // Save edits in the Files view as they're made: a moment after typing stops, and on
-  // leaving the file, the editor or Palace.
+  // leaving the file, the editor or Recastle.
   autoSave: true,
   githubAvatars: true,
   // Where new clones go, as <folder>/<owner>/<repository>; null until chosen, when
   // it's worked out from where recent repositories are (see clone.js).
   cloneFolder: null,
   // Say when a terminal's agent finishes or needs you while you're looking elsewhere:
-  // a notice in the Palace window you're in, or the system's notification. The tabs
+  // a notice in the Recastle window you're in, or the system's notification. The tabs
   // show it either way.
   agentNotifications: true,
   // Opening the terminal panel with no tabs starts the agent (see agents.js) rather
@@ -44,7 +44,7 @@ const DEFAULTS = {
   // Fetch the open repository's remotes every `fetchMinutes` minutes.
   fetchInBackground: true,
   fetchMinutes: 5,
-  // Look for new versions of Palace on GitHub at startup and daily.
+  // Look for new versions of Recastle on GitHub at startup and daily.
   checkForUpdates: true,
 };
 

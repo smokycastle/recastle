@@ -1,6 +1,6 @@
 # Architecture
 
-How Palace is put together, and the habits that keep it workable. Palace is meant to
+How Recastle is put together, and the habits that keep it workable. Recastle is meant to
 keep improving for years without breaking or getting messy, and most of what's here
 serves that.
 
@@ -9,7 +9,7 @@ details to the code and its comments, which are kept current where this can't be
 
 ## The two halves
 
-Palace is a [Tauri](https://tauri.app) app: a Rust backend and a web page shown in the
+Recastle is a [Tauri](https://tauri.app) app: a Rust backend and a web page shown in the
 system's web view (WebKit on macOS and Linux).
 
 - **The backend** (`src-tauri/src/`) does everything that touches the system: reading
@@ -32,7 +32,7 @@ so a button that does nothing is worth checking there first.
 
 ## Repositories: read with libgit2, changed with git
 
-Palace reads repositories directly with libgit2 (the `git2` crate), which is fast and
+Recastle reads repositories directly with libgit2 (the `git2` crate), which is fast and
 needs no process per read: history, status, diffs, branches.
 
 Anything that **changes** a repository runs the user's own `git` (see `cli.rs`), so
@@ -48,7 +48,7 @@ back only what the operation changed, and only if nothing else has changed it si
 Each window holds repositories in tabs, across its top once there are two, each with
 its own terminals, and a repository is open in one tab at a time: opening it again shows
 that tab, and its window. The page tells the backend each window's tabs as they change
-(`set_window_tabs`), so another window can find one, and Palace reopens them, with the
+(`set_window_tabs`), so another window can find one, and Recastle reopens them, with the
 windows they were in, as it next starts, after quitting or restarting itself
 (`reopen.rs`). The backend keeps track of what belongs to which window,
 and lets it all go when the window closes. Code that keeps per-window state on the
@@ -68,7 +68,7 @@ close button does.
 - **`App.vue`** is the window: what belongs to it, whatever tab is showing. It checks
   for git at startup, holds the tabs (`windowTabs.js` and `tabs.js`, drawn by
   `TabStrip.vue`), shows the dialogs and menus over everything, asks before the window
-  closes or Palace quits, and hears what every window's agents are doing.
+  closes or Recastle quits, and hears what every window's agents are doing.
 - **`components/Workspace.vue`** is a tab: the open repository, the state its views
   share (what's selected, the commit message being written) and the wiring between
   them, or with none open, the welcome screen. It should stay wiring. When a piece of
@@ -117,7 +117,7 @@ never on an error's wording.
   that pass before and after. Write the tests first where the code isn't tested yet.
 - **One thing, done once.** When the same logic turns up twice, it becomes a shared
   function or module rather than a second copy.
-- **Look before adding.** Palace already has helpers for most common needs: dialogs and
+- **Look before adding.** Recastle already has helpers for most common needs: dialogs and
   menus (`overlays.js`), the status card, platform differences (`platform.js`), saved
   data. Use them, so things look and behave the same everywhere. The same goes for
   styles: text sizes, corners and shadows come from the variables at the top of
@@ -156,5 +156,5 @@ git push --follow-tags              # GitHub builds, publishes and updates the w
 The notes file holds only the release's own sections (such as `### Changes` and
 `### Fixes`); the release workflow adds the heading and the install instructions. It
 runs the backend tests again on each platform before building, but not the page's
-checks, so push and let those pass first. Installed copies of Palace find the new
+checks, so push and let those pass first. Installed copies of Recastle find the new
 version on their own.

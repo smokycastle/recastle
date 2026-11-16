@@ -1,4 +1,4 @@
-//! Commits a branch has lost: when, outside Palace, a branch is moved back, as by
+//! Commits a branch has lost: when, outside Recastle, a branch is moved back, as by
 //! `git reset --hard`, or deleted, its commits that nothing else has go with it, and git
 //! keeps them only in its reflog until it clears them away. The page asks about each
 //! branch that moved back or went, and says so while they can still be had back (see
@@ -18,7 +18,7 @@ const MOST: usize = 1000;
 /// `new`, or with None, gone: 0 when it moved forward, or was rewritten, rather than
 /// moved back, and up to a thousand otherwise.
 ///
-/// A branch reset back and then committed on before Palace looks again isn't counted:
+/// A branch reset back and then committed on before Recastle looks again isn't counted:
 /// its new tip doesn't descend from where it went back to, so it looks rewritten. The
 /// branch's reflog could tell them apart, at the cost of reading it each time.
 #[tauri::command]

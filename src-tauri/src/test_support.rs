@@ -28,7 +28,7 @@ impl TempRepo {
     }
 
     fn fresh_dir(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("palace-test-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         dir
     }

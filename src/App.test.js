@@ -63,7 +63,7 @@ const repository = (path, name, extra = {}) => ({
   files: [],
   ...extra,
 });
-const PALACE = "/code/palace";
+const RECASTLE = "/code/recastle";
 const OTHER = "/code/other";
 const THIRD = "/code/third";
 const changed = (path, more = {}) => ({ path, old_path: null, staged: null, unstaged: "modified", conflicted: false, ...more });
@@ -73,18 +73,18 @@ let answers;
 let repositories;
 beforeEach(() => {
   repositories = {
-    [PALACE]: repository(PALACE, "palace", { changes: 1, files: [changed("README.md")] }),
+    [RECASTLE]: repository(RECASTLE, "recastle", { changes: 1, files: [changed("README.md")] }),
     [OTHER]: repository(OTHER, "other", { changes: 1, files: [changed("notes.txt")] }),
     [THIRD]: repository(THIRD, "third"),
   };
   answers = {
     git_check: { supported: true, version: "2.50.0" },
-    window_start: { tabs: { repos: [PALACE], active: 0 }, first: true },
+    window_start: { tabs: { repos: [RECASTLE], active: 0 }, first: true },
     folders_gone: [],
     folder_exists: true,
     load_store: {
       "recastle.recentRepositories": [
-        { name: "palace", path: PALACE },
+        { name: "recastle", path: RECASTLE },
         { name: "other", path: OTHER },
         { name: "third", path: THIRD },
       ],
@@ -175,16 +175,16 @@ async function start() {
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
-  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("palace"));
+  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("recastle"));
   return root;
 }
 
 test("the window starts, opening the repository it had, without an error", async () => {
   const root = await start();
   expect(errors).toEqual([]);
-  expect(invoke).toHaveBeenCalledWith("repo_overview", expect.objectContaining({ path: PALACE }));
+  expect(invoke).toHaveBeenCalledWith("repo_overview", expect.objectContaining({ path: RECASTLE }));
   // The sidebar shows it: its name, its branch and its tag.
-  expect(root.querySelector(".repo-name")?.textContent).toContain("palace");
+  expect(root.querySelector(".repo-name")?.textContent).toContain("recastle");
   expect(root.textContent).toContain("main");
   expect(root.textContent).toContain("v1.0.0");
 });
@@ -199,7 +199,7 @@ test("a tab behind the one showing waits to open its repository until it's first
   await loadStore();
   const { default: Workspace } = await import("./components/Workspace.vue");
   const showing = ref(false);
-  app = createApp({ render: () => h(Workspace, { opens: PALACE, active: showing.value }) });
+  app = createApp({ render: () => h(Workspace, { opens: RECASTLE, active: showing.value }) });
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
@@ -208,8 +208,8 @@ test("a tab behind the one showing waits to open its repository until it's first
   expect(calls("watch_repo")).toEqual([]);
 
   showing.value = true;
-  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("palace"));
-  expect(window.setTitle).toHaveBeenLastCalledWith("palace — Palace");
+  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("recastle"));
+  expect(window.setTitle).toHaveBeenLastCalledWith("recastle — Recastle");
 });
 
 test("a workspace that isn't the one showing leaves the window's title and keys alone, until it shows again", async () => {
@@ -217,11 +217,11 @@ test("a workspace that isn't the one showing leaves the window's title and keys 
   await loadStore();
   const { default: Workspace } = await import("./components/Workspace.vue");
   const showing = ref(true);
-  app = createApp({ render: () => h(Workspace, { opens: PALACE, active: showing.value }) });
+  app = createApp({ render: () => h(Workspace, { opens: RECASTLE, active: showing.value }) });
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
-  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("palace"));
+  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("recastle"));
   showing.value = false;
   await settle();
   window.setTitle.mockClear();
@@ -233,24 +233,24 @@ test("a workspace that isn't the one showing leaves the window's title and keys 
 
   showing.value = true;
   await until(() => window.setTitle.mock.calls.length > 0);
-  expect(window.setTitle).toHaveBeenLastCalledWith("palace — Palace");
+  expect(window.setTitle).toHaveBeenLastCalledWith("recastle — Recastle");
 });
 
 test("a repository opened through a link is known by its own folder as git lists it, as its worktrees are", async () => {
-  // Opened as /code/palace, a link to where git has it.
-  const main = { path: "/disk/palace", branch: "main", main: true, current: true, locked: false, prunable: false };
-  repositories[PALACE] = repository(PALACE, "palace", { worktrees: [main] });
+  // Opened as /code/recastle, a link to where git has it.
+  const main = { path: "/disk/recastle", branch: "main", main: true, current: true, locked: false, prunable: false };
+  repositories[RECASTLE] = repository(RECASTLE, "recastle", { worktrees: [main] });
   await start();
-  await until(() => !!calls("set_window_tabs").at(-1)?.tabs.homes?.[PALACE]);
-  expect(calls("set_window_tabs").at(-1).tabs.homes).toEqual({ [PALACE]: { path: "/disk/palace", worktree: false } });
+  await until(() => !!calls("set_window_tabs").at(-1)?.tabs.homes?.[RECASTLE]);
+  expect(calls("set_window_tabs").at(-1).tabs.homes).toEqual({ [RECASTLE]: { path: "/disk/recastle", worktree: false } });
 });
 
 test("a repository opened is the window's: the backend's told, the window's titled, and its folder watched", async () => {
   await start();
   await until(() => calls("watch_repo").length > 0);
-  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [PALACE], active: 0, kept: [] }) });
-  expect(window.setTitle).toHaveBeenLastCalledWith("palace — Palace");
-  expect(calls("watch_repo")).toEqual([{ path: PALACE }]);
+  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [RECASTLE], active: 0, kept: [] }) });
+  expect(window.setTitle).toHaveBeenLastCalledWith("recastle — Recastle");
+  expect(calls("watch_repo")).toEqual([{ path: RECASTLE }]);
 });
 
 test("switching repositories starts its views afresh, and keeps each one's commit message for when it's back", async () => {
@@ -262,14 +262,14 @@ test("switching repositories starts its views afresh, and keeps each one's commi
   await switchTo("other");
   expect(calls("watch_repo").at(-1)).toEqual({ path: OTHER });
   // The backend lets go of the one before: it isn't watched, and its history goes.
-  expect(calls("release_repo")).toEqual([{ path: PALACE }]);
-  expect(window.setTitle).toHaveBeenLastCalledWith("other — Palace");
+  expect(calls("release_repo")).toEqual([{ path: RECASTLE }]);
+  expect(window.setTitle).toHaveBeenLastCalledWith("other — Recastle");
   // Its history shows, not the Working Copy the other was on.
   expect(subject()).toBeNull();
   await showWorkingCopy();
   expect(subject().value).toBe("");
 
-  await switchTo("palace");
+  await switchTo("recastle");
   await showWorkingCopy();
   expect(subject().value).toBe("Fix the README");
   expect(errors).toEqual([]);
@@ -282,8 +282,8 @@ test("a change the backend sees in the folder refreshes the repository, and one 
   await settle();
   expect(calls("repo_overview")).toHaveLength(before);
 
-  repositories[PALACE].tags = ["v1.0.0", "v2.0.0"];
-  send("repo-changed", { path: PALACE });
+  repositories[RECASTLE].tags = ["v1.0.0", "v2.0.0"];
+  send("repo-changed", { path: RECASTLE });
   await until(() => shown("v2.0.0"));
   expect(calls("repo_overview").length).toBeGreaterThan(before);
 });
@@ -291,8 +291,8 @@ test("a change the backend sees in the folder refreshes the repository, and one 
 test("a folder that's gone says so, and its Close Tab closes its tab, the window with its last", async () => {
   await start();
   answers.folder_exists = false;
-  send("repo-changed", { path: PALACE });
-  await until(() => shown("“palace” was moved or deleted"));
+  send("repo-changed", { path: RECASTLE });
+  await until(() => shown("“recastle” was moved or deleted"));
   button("Close Tab").click();
   expect(window.close).toHaveBeenCalled();
 });
@@ -303,7 +303,7 @@ test("a network operation's progress shows on the status card while it runs, and
   answers.fetch = () => new Promise((resolve) => (finish = resolve));
   document.querySelector(".toolbar.actions .icon-button").click();
   await until(() => !!finish);
-  send("remote-progress", { path: PALACE, line: "Receiving objects: 42%" });
+  send("remote-progress", { path: RECASTLE, line: "Receiving objects: 42%" });
   await until(() => shown("Receiving objects: 42%"));
   // Another repository's isn't this one's.
   send("remote-progress", { path: OTHER, line: "Counting objects: 7" });
@@ -312,7 +312,7 @@ test("a network operation's progress shows on the status card while it runs, and
   expect(shown("Counting objects: 7")).toBe(false);
 
   button("Cancel").click();
-  expect(calls("cancel_remote")).toEqual([{ path: PALACE }]);
+  expect(calls("cancel_remote")).toEqual([{ path: RECASTLE }]);
   finish(null);
   await settle();
 });
@@ -323,7 +323,7 @@ test("a keyboard shortcut reaches the open repository", async () => {
   document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "r", metaKey: isMac, ctrlKey: !isMac, bubbles: true }));
   // Refreshed, and fetched.
   await until(() => calls("fetch").length > 0);
-  expect(calls("fetch")[0]).toMatchObject({ path: PALACE });
+  expect(calls("fetch")[0]).toMatchObject({ path: RECASTLE });
   await until(() => calls("repo_overview").length > before);
 });
 
@@ -346,13 +346,13 @@ test("closing the window goes ahead with nothing to lose, and otherwise asks fir
 // Working Copy, marked as resolved.
 async function resolveFirstConflict() {
   const conflicted = (path) => changed(path, { unstaged: null, conflicted: true });
-  repositories[PALACE] = repository(PALACE, "palace", { changes: 2, conflicts: 2, files: [conflicted("a.txt"), conflicted("b.txt")] });
+  repositories[RECASTLE] = repository(RECASTLE, "recastle", { changes: 2, conflicts: 2, files: [conflicted("a.txt"), conflicted("b.txt")] });
   answers.conflict_file = "resolved\n";
   // Resolving is undoable: undo keeps a copy of how things were before and after.
   let taken = 0;
   answers.take_snapshot = () => ({ head_branch: "main", head_id: `snapshot ${++taken}`, refs: {}, upstreams: {}, stashes: [], files: [] });
   answers.resolve_conflict = () => {
-    repositories[PALACE].files[0] = changed("a.txt", { staged: "modified", unstaged: null });
+    repositories[RECASTLE].files[0] = changed("a.txt", { staged: "modified", unstaged: null });
     return null;
   };
   await start();
@@ -366,7 +366,7 @@ async function resolveFirstConflict() {
 test("once a conflicted file is resolved, the next one shows", async () => {
   await resolveFirstConflict();
   await until(() => document.querySelector(".file-title")?.textContent === "b.txt");
-  expect(calls("resolve_conflict")[0]).toMatchObject({ path: PALACE, file: "a.txt", side: "resolved" });
+  expect(calls("resolve_conflict")[0]).toMatchObject({ path: RECASTLE, file: "a.txt", side: "resolved" });
 });
 
 test("undo steps stay with their repository, while another's open", async () => {
@@ -379,10 +379,10 @@ test("undo steps stay with their repository, while another's open", async () => 
   await settle();
   expect(calls("restore_snapshot")).toEqual([]);
 
-  await switchTo("palace");
+  await switchTo("recastle");
   undoKey();
   await until(() => calls("restore_snapshot").length > 0);
-  expect(calls("restore_snapshot")[0]).toMatchObject({ path: PALACE });
+  expect(calls("restore_snapshot")[0]).toMatchObject({ path: RECASTLE });
 });
 
 // --- Tabs --------------------------------------------------------------------------
@@ -417,37 +417,37 @@ test("one tab looks as a window without tabs; a second brings their row, and clo
 test("a new tab opens to choose a repository in, which opens there, beside the other", async () => {
   await start();
   await openInNewTab("other");
-  expect(tabNames()).toEqual(["palace", "other"]);
+  expect(tabNames()).toEqual(["recastle", "other"]);
   await until(() => calls("set_window_tabs").at(-1)?.tabs.repos.length === 2);
-  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [PALACE, OTHER], active: 1, kept: [] }) });
+  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [RECASTLE, OTHER], active: 1, kept: [] }) });
   // Each keeps its own repository, watched, while the other shows.
-  expect(calls("watch_repo")).toEqual([{ path: PALACE }, { path: OTHER }]);
+  expect(calls("watch_repo")).toEqual([{ path: RECASTLE }, { path: OTHER }]);
   expect(calls("release_repo")).toEqual([]);
-  expect(window.setTitle).toHaveBeenLastCalledWith("other — Palace");
+  expect(window.setTitle).toHaveBeenLastCalledWith("other — Recastle");
 });
 
 test("clicking a tab, or the keys for one, shows it, and the window's title names it", async () => {
   await start();
   await openInNewTab("other");
-  tabNamed("palace").click();
-  await until(() => showingTab() === "palace");
-  expect(window.setTitle).toHaveBeenLastCalledWith("palace — Palace");
+  tabNamed("recastle").click();
+  await until(() => showingTab() === "recastle");
+  expect(window.setTitle).toHaveBeenLastCalledWith("recastle — Recastle");
   press("2", { code: "Digit2" });
   await until(() => showingTab() === "other");
   press("Tab", { metaKey: false, ctrlKey: true, code: "Tab" });
-  await until(() => showingTab() === "palace");
+  await until(() => showingTab() === "recastle");
   // Only the tab showing acts on keys meant for one: ⌘R refreshes and fetches it.
   press("r", { code: "KeyR" });
   await until(() => calls("fetch").length > 0);
-  expect(calls("fetch").map((args) => args.path)).toEqual([PALACE]);
+  expect(calls("fetch").map((args) => args.path)).toEqual([RECASTLE]);
 });
 
 test("opening a repository open in another tab shows that tab rather than opening it twice", async () => {
   await start();
   await openInNewTab("other");
-  await switchTo("palace");
-  expect(tabNames()).toEqual(["palace", "other"]);
-  expect(showingTab()).toBe("palace");
+  await switchTo("recastle");
+  expect(tabNames()).toEqual(["recastle", "other"]);
+  expect(showingTab()).toBe("recastle");
 });
 
 test("closing a tab asks first when it has edits not saved, and the last tab closes the window", async () => {
@@ -459,7 +459,7 @@ test("closing a tab asks first when it has edits not saved, and the last tab clo
   await until(() => shown("Edits to “notes.txt” aren't saved. Closing the tab loses them."));
   button("Cancel").click();
   await settle();
-  expect(tabNames()).toEqual(["palace", "other"]);
+  expect(tabNames()).toEqual(["recastle", "other"]);
 
   tabNamed("other").querySelector(".close").click();
   await until(() => !!button("Close"));
@@ -479,7 +479,7 @@ test("closing a tab asks first when it has edits not saved, and the last tab clo
 });
 
 test("the window starts with the tabs it had, the one that was showing showing", async () => {
-  answers.window_start = { tabs: { repos: [PALACE, OTHER], active: 1 }, first: false };
+  answers.window_start = { tabs: { repos: [RECASTLE, OTHER], active: 1 }, first: false };
   errors = [];
   const { loadStore } = await import("./lib/storage.js");
   await loadStore();
@@ -489,18 +489,18 @@ test("the window starts with the tabs it had, the one that was showing showing",
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
-  await until(() => tabNames().join() === "palace,other" && showingTab() === "other");
+  await until(() => tabNames().join() === "recastle,other" && showingTab() === "other");
   expect(errors).toEqual([]);
 });
 
 test("another window asking for a repository open here shows its tab; a worktree removed closes its", async () => {
   await start();
   await openInNewTab("other");
-  send("show-repo", { path: PALACE });
-  await until(() => showingTab() === "palace");
+  send("show-repo", { path: RECASTLE });
+  await until(() => showingTab() === "recastle");
   send("close-repo", { path: OTHER });
   await until(() => !document.querySelector(".tab-strip"));
-  expect(showing().querySelector(".repo-name").textContent).toContain("palace");
+  expect(showing().querySelector(".repo-name").textContent).toContain("recastle");
   // Asked already, as the worktree was removed: not again.
   expect(confirmShown()).toBe(false);
 });
@@ -508,8 +508,8 @@ test("another window asking for a repository open here shows its tab; a worktree
 test("a notice clicked shows the tab its terminal's repository is in", async () => {
   await start();
   await openInNewTab("other");
-  send("show-terminal-tab", { path: PALACE, key: 3 });
-  await until(() => showingTab() === "palace");
+  send("show-terminal-tab", { path: RECASTLE, key: 3 });
+  await until(() => showingTab() === "recastle");
 });
 
 // A terminal tab in the repository at `path`, with something running in it, or not.
@@ -570,12 +570,12 @@ test("a repository open in another window brings that forward, rather than openi
   await until(() => calls("show_window_with").some((args) => args.path === OTHER));
   // The tab opened to choose it in has done that, and goes.
   await until(() => !document.querySelector(".tab-strip"));
-  expect(showing().querySelector(".repo-name").textContent).toContain("palace");
+  expect(showing().querySelector(".repo-name").textContent).toContain("recastle");
 });
 
 test("a worktree removed that's the window's last tab closes the window, asked already", async () => {
   await start();
-  send("close-repo", { path: PALACE });
+  send("close-repo", { path: RECASTLE });
   await until(() => calls("quit_confirmed").length > 0);
   expect(calls("quit_confirmed")).toEqual([{ quitting: false }]);
 });
@@ -590,7 +590,7 @@ test("a notice clicked for a tab closed since opens it once, not twice", async (
   await until(() => showingTab() === "other");
   await settle();
   expect(calls("repo_overview").filter((args) => args.path === OTHER).length - before).toBe(1);
-  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [PALACE, OTHER], active: 1, kept: [] }) });
+  expect(calls("set_window_tabs").at(-1)).toEqual({ tabs: expect.objectContaining({ repos: [RECASTLE, OTHER], active: 1, kept: [] }) });
 });
 
 test("with git missing, the tabs the window had are kept for when it's found", async () => {
@@ -632,7 +632,7 @@ test("a tab closed while it opens starts no agent on its task", async () => {
 
 test("at startup, the last repository open in another window brings that forward, and this one starts with none", async () => {
   answers.window_start = { tabs: { repos: [], active: null }, first: true };
-  answers.show_window_with = ({ path }) => path === PALACE;
+  answers.show_window_with = ({ path }) => path === RECASTLE;
   const { loadStore } = await import("./lib/storage.js");
   await loadStore();
   const { default: App } = await import("./App.vue");
@@ -640,7 +640,7 @@ test("at startup, the last repository open in another window brings that forward
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
-  await until(() => calls("show_window_with").some((args) => args.path === PALACE));
+  await until(() => calls("show_window_with").some((args) => args.path === RECASTLE));
   await until(() => !!document.querySelector(".welcome"));
   expect(calls("watch_repo")).toEqual([]);
 });
@@ -654,11 +654,11 @@ test("a tab's own dialog, as New Issue, keeps the window's keys from closing or 
   press("1", { code: "Digit1" });
   send("menu", "close-tab");
   await settle();
-  expect(tabNames()).toEqual(["palace", "other"]);
+  expect(tabNames()).toEqual(["recastle", "other"]);
   expect(showingTab()).toBe("other");
   dialog.remove();
   press("1", { code: "Digit1" });
-  await until(() => showingTab() === "palace");
+  await until(() => showingTab() === "recastle");
 });
 
 test("closing a tab stops the fetch, pull or push under way in it", async () => {
@@ -678,7 +678,7 @@ test("keys leave a tab as another's shown, rather than going on into it hidden",
   field.focus();
   expect(document.activeElement).toBe(field);
   press("1", { code: "Digit1" });
-  await until(() => showingTab() === "palace");
+  await until(() => showingTab() === "recastle");
   await settle();
   expect(document.activeElement).not.toBe(field);
 });
@@ -689,9 +689,9 @@ test("a repository is the last opened as it's opened where it's seen, not as a t
   const { readJson } = await import("./lib/storage.js");
   const first = () => readJson("recastle.recentRepositories", [])[0]?.path;
   expect(first()).toBe(OTHER);
-  // palace's tab, behind, refreshes as its folder changes.
-  send("repo-changed", { path: PALACE });
-  await until(() => calls("repo_overview").filter((args) => args.path === PALACE).length > 1);
+  // recastle's tab, behind, refreshes as its folder changes.
+  send("repo-changed", { path: RECASTLE });
+  await until(() => calls("repo_overview").filter((args) => args.path === RECASTLE).length > 1);
   await settle();
   expect(first()).toBe(OTHER);
 });
@@ -702,7 +702,7 @@ test("quitting while closing the window's asked asks first, with closing asked a
   send("quit-requested", { quitting: false, ...nothing, other_terminals: ["shop"] });
   await until(() => shown("Close Window?"));
   send("quit-requested", { quitting: true, ...nothing, other_terminals: ["shop"] });
-  await until(() => shown("Quit Palace?"));
+  await until(() => shown("Quit Recastle?"));
   button("Cancel").click();
   await until(() => shown("Close Window?"));
   expect(calls("quit_confirmed")).toEqual([]);
@@ -718,11 +718,11 @@ test("a tab letting go of a repository another tab shows leaves it watched for t
   const { loadStore } = await import("./lib/storage.js");
   await loadStore();
   const { default: Workspace } = await import("./components/Workspace.vue");
-  app = createApp({ render: () => h(Workspace, { opens: PALACE, shownElsewhere: () => true }) });
+  app = createApp({ render: () => h(Workspace, { opens: RECASTLE, shownElsewhere: () => true }) });
   const root = document.createElement("div");
   document.body.append(root);
   app.mount(root);
-  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("palace"));
+  await until(() => !!root.querySelector(".repo-name")?.textContent.includes("recastle"));
   app.unmount();
   app = null;
   await settle();

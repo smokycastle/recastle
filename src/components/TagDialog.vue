@@ -87,7 +87,7 @@ function onKeydown(event) {
   <div class="backdrop" @mousedown.self="closeTagDialog(null)" @keydown="onKeydown">
     <form class="dialog" @keydown="submitOnEnter" @submit.prevent="submit">
       <header>
-        <img src="/palace.svg" alt="" class="app-icon" />
+        <img src="/recastle.svg" alt="" class="app-icon" />
         <div>
           <h2>Create New Tag</h2>
           <p>

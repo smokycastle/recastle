@@ -14,12 +14,12 @@ const percent = computed(() => (updates.total ? Math.min(100, Math.round((update
     <ArrowDownCircle :size="20" :stroke-width="1.75" class="icon" />
     <div class="body">
       <template v-if="updates.state === 'installing'">
-        <strong>Installing Palace {{ updates.version }}…</strong>
+        <strong>Installing Recastle {{ updates.version }}…</strong>
         <div class="bar"><div class="fill" :style="{ width: `${percent ?? 15}%` }" :class="{ unknown: percent == null }" /></div>
-        <span class="dim">Palace restarts when it's done. You may be asked for your password.</span>
+        <span class="dim">Recastle restarts when it's done. You may be asked for your password.</span>
       </template>
       <template v-else-if="updates.state === 'error'">
-        <strong>Couldn't install Palace {{ updates.version }}</strong>
+        <strong>Couldn't install Recastle {{ updates.version }}</strong>
         <span class="error">{{ updates.error }}</span>
         <div class="actions">
           <button class="secondary-button" @click="openUrl(releaseNotesUrl(updates.version))">Download It Yourself</button>
@@ -27,7 +27,7 @@ const percent = computed(() => (updates.total ? Math.min(100, Math.round((update
         </div>
       </template>
       <template v-else>
-        <strong>Palace {{ updates.version }} is available</strong>
+        <strong>Recastle {{ updates.version }} is available</strong>
         <span class="dim">You have {{ updates.current }}.</span>
         <div class="actions">
           <button class="primary-button" @click="installUpdate">Install and Restart</button>

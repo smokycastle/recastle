@@ -87,7 +87,7 @@ async function deleteFile() {
 }
 
 // Staged as it is, which may not be what was meant: with conflicts still in it, as
-// when one was missed, or with edits in Palace's editor not saved yet. It's read again
+// when one was missed, or with edits in Recastle's editor not saved yet. It's read again
 // first, as it may have been edited elsewhere since it was shown.
 async function markResolved() {
   // Busy while it's read and asked about, so a second click doesn't resolve it twice.
@@ -98,7 +98,7 @@ async function markResolved() {
   if (left || unsaved) {
     const why = [
       left && `It still has ${left === 1 ? "a conflict" : `${left} conflicts`} in it, which would be committed as ${left === 1 ? "it is" : "they are"}, markers and all.`,
-      unsaved && "It has edits in Palace's editor that aren't saved, which would be left out.",
+      unsaved && "It has edits in Recastle's editor that aren't saved, which would be left out.",
     ];
     const ok = await askConfirm({
       title: "Mark as Resolved",

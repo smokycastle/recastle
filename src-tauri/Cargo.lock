@@ -3145,36 +3145,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "palace"
-version = "0.46.1"
-dependencies = [
- "ammonia",
- "base64 0.23.1",
- "git2",
- "gtk",
- "keyring",
- "libc",
- "notify",
- "notify-rust",
- "objc2-app-kit",
- "portable-pty",
- "pulldown-cmark",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-process",
- "tauri-plugin-updater",
- "trash",
- "ureq",
- "zbus 5.19.0",
-]
-
-[[package]]
 name = "pango"
 version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3649,6 +3619,36 @@ name = "raw-window-handle"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
+
+[[package]]
+name = "recastle"
+version = "0.46.1"
+dependencies = [
+ "ammonia",
+ "base64 0.23.1",
+ "git2",
+ "gtk",
+ "keyring",
+ "libc",
+ "notify",
+ "notify-rust",
+ "objc2-app-kit",
+ "portable-pty",
+ "pulldown-cmark",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-process",
+ "tauri-plugin-updater",
+ "trash",
+ "ureq",
+ "zbus 5.19.0",
+]
 
 [[package]]
 name = "redox_syscall"

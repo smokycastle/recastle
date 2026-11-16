@@ -5,7 +5,7 @@ import { Check, CircleAlert, ExternalLink, Minus } from "lucide-vue-next";
 import { githubAccount, NEW_TOKEN_URL, SCOPES, signInWithToken, signOut } from "../lib/github.js";
 import { askConfirm } from "../lib/overlays.js";
 
-// Who Palace is signed in as, what the token allows, and signing out.
+// Who Recastle is signed in as, what the token allows, and signing out.
 defineProps({
   // The token's scopes, or null for a fine-grained token (which doesn't list them).
   scopes: { type: Array, default: null },
@@ -23,7 +23,7 @@ async function confirmSignOut() {
   const ok = await askConfirm({
     title: "Sign Out of GitHub",
     message:
-      "Sign out of GitHub in Palace?\n\nPalace forgets the token. Fetching, pulling and pushing then use whatever login git has of its own, if any.",
+      "Sign out of GitHub in Recastle?\n\nRecastle forgets the token. Fetching, pulling and pushing then use whatever login git has of its own, if any.",
     confirmLabel: "Sign Out",
     danger: true,
   });
@@ -51,7 +51,7 @@ async function confirmSignOut() {
     <section>
       <h3>Personal Access Token</h3>
       <p class="note">
-        Palace signs in to GitHub with this token, kept in your system keyring. Git in the terminal isn't affected.
+        Recastle signs in to GitHub with this token, kept in your system keyring. Git in the terminal isn't affected.
       </p>
       <ul v-if="scopes" class="scopes">
         <li v-for="scope in SCOPES" :key="scope.name" :class="{ missing: !scopes.includes(scope.name) }">

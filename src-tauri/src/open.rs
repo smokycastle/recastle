@@ -1,4 +1,4 @@
-//! Opening the repository outside Palace: its folder in the file manager, a file shown
+//! Opening the repository outside Recastle: its folder in the file manager, a file shown
 //! in its folder, and a file in the app the system has for it.
 
 use git2::Repository;
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn a_file_with_a_nul_byte_isnt_text() {
-        let dir = std::env::temp_dir().join(format!("palace-open-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-open-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("a.vue"), "<template></template>\n").unwrap();
         std::fs::write(dir.join("b.bin"), [0x89, b'P', 0, 1]).unwrap();

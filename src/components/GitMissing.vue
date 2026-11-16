@@ -16,11 +16,11 @@ const emit = defineEmits(["recheck"]);
 // with Apple's Command Line Tools, or from Homebrew.
 const command = isMac ? "brew install git" : "sudo apt install git";
 
-const title = computed(() => (props.status.version ? "Palace needs a newer Git" : "Palace needs Git"));
+const title = computed(() => (props.status.version ? "Recastle needs a newer Git" : "Recastle needs Git"));
 const message = computed(() => {
   const needs = props.status.version
-    ? `Git ${props.status.version} is installed, but Palace needs ${props.status.minimum} or newer.`
-    : "Palace uses Git to make every change to your repositories, and it isn't installed.";
+    ? `Git ${props.status.version} is installed, but Recastle needs ${props.status.minimum} or newer.`
+    : "Recastle uses Git to make every change to your repositories, and it isn't installed.";
   if (!isMac) return `${needs} ${props.status.version ? "Update" : "Install"} it in a terminal:`;
   return props.status.version
     ? `${needs} Update the Command Line Tools in System Settings › Software Update, or install a newer Git with Homebrew:`

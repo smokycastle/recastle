@@ -1,7 +1,7 @@
 <script setup>
 import { onBeforeUnmount, ref, watch } from "vue";
 
-// Palace's icon, which answers Check for Updates: while it checks, a light runs around
+// Recastle's icon, which answers Check for Updates: while it checks, a light runs around
 // the gatehouse, as the spinner does around its gate; up to date, the archway glows
 // for a moment; with an update waiting, it stays lit.
 const props = defineProps({
@@ -13,7 +13,7 @@ const props = defineProps({
 // One lap of the light, and so the least it runs: a quick check would only flash it.
 const LAP = 1200;
 
-// Drawn over the icon's artwork, in its coordinates (see public/palace.svg).
+// Drawn over the icon's artwork, in its coordinates (see public/recastle.svg).
 const PLACE = "matrix(1.09181 0 0 1.09181 -74.30 33.79)";
 const GATEHOUSE =
   "M385 588 L393.3 292.7 L454 278.3 L458.3 316 L500 304 L500.7 261.7 L535.5 252.7 L570.3 261.7 L571 304 L612.7 316 L617 278.3 L677.7 292.7 L686 588 L603 570 L603 444.2 A67.5 67.5 0 0 0 468 444.2 L468 570 Z";
@@ -53,7 +53,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 
 <template>
   <span class="gate-logo" :style="{ width: `${size}px`, height: `${size}px`, '--lap': `${LAP}ms` }">
-    <img src="/palace.svg" alt="" />
+    <img src="/recastle.svg" alt="" />
     <svg viewBox="0 0 1024 1024" aria-hidden="true">
       <defs>
         <radialGradient id="gate-logo-light" cx="535.5" cy="540" r="140" gradientUnits="userSpaceOnUse">

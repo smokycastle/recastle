@@ -1,4 +1,4 @@
-//! What the About page (the top and foot of Settings) says of Palace that only its
+//! What the About page (the top and foot of Settings) says of Recastle that only its
 //! configuration knows, so it's said in one place, tauri.conf.json, as the system's
 //! About panel had it. Read from the file itself, built in: the configuration Tauri
 //! builds in leaves the copyright out.
@@ -14,7 +14,7 @@ pub struct About {
 }
 
 #[tauri::command]
-pub fn about_palace() -> About {
+pub fn about_recastle() -> About {
     read(include_str!("../tauri.conf.json"))
 }
 
@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn reading_the_copyright_and_license() {
-        let about = about_palace();
+        let about = about_recastle();
         assert!(about.copyright.as_deref().is_some_and(|c| c.starts_with("Copyright © ")), "{about:?}");
         assert_eq!(about.license.as_deref(), Some("MIT"));
         assert_eq!(read("not json"), About { copyright: None, license: None });

@@ -1,5 +1,5 @@
-// The Palace menu's own items, on macOS (see menu.rs): About Palace and Check for
-// Updates… show Palace's page for them, the top of Settings, the second checking as it
+// The Recastle menu's own items, on macOS (see menu.rs): About Recastle and Check for
+// Updates… show Recastle's page for them, the top of Settings, the second checking as it
 // opens. The window in front is told which was chosen.
 import { onBeforeUnmount } from "vue";
 import { checkForUpdates } from "./updates.js";

@@ -72,7 +72,7 @@ describe("shortcutFor", () => {
     expect(mac("Cmd+Shift+t", {}, "KeyK")).toBe("newTerminalTab");
   });
 
-  test("goes between the window's tabs, from a terminal too where the keys are Palace's", () => {
+  test("goes between the window's tabs, from a terminal too where the keys are Recastle's", () => {
     expect(mac("Cmd+3", {}, "Digit3")).toBe("showTab");
     expect(linux("Ctrl+9", {}, "Digit9")).toBe("showTab");
     expect(mac("Cmd+0", {}, "Digit0")).toBeNull();
@@ -81,7 +81,7 @@ describe("shortcutFor", () => {
     expect(mac("Cmd+Shift+}", {}, "BracketRight")).toBe("nextTab");
     expect(mac("Cmd+Shift+{", {}, "BracketLeft")).toBe("previousTab");
     expect(linux("Ctrl+Shift+}", {}, "BracketRight")).toBeNull();
-    // In a terminal: Palace's on a Mac, the shell's on Linux, but for Ctrl+Tab, which
+    // In a terminal: Recastle's on a Mac, the shell's on Linux, but for Ctrl+Tab, which
     // shells don't use.
     expect(mac("Cmd+w", { inTerminal: true })).toBe("closeTab");
     expect(mac("Cmd+2", { inTerminal: true }, "Digit2")).toBe("showTab");
@@ -99,7 +99,7 @@ describe("shortcutFor", () => {
     for (const keys of ["Cmd+z", "Cmd+r", "Cmd+p", "Cmd+f", "Cmd+,", "/", "Alt+ArrowLeft"]) {
       expect(mac(keys, { inTerminal: true }), keys).toBeNull();
     }
-    // Cmd+N is Palace's in a Mac's terminal; Ctrl+N is the shell's on Linux.
+    // Cmd+N is Recastle's in a Mac's terminal; Ctrl+N is the shell's on Linux.
     expect(mac("Cmd+n", { inTerminal: true })).toBe("newWindow");
     expect(linux("Ctrl+n", { inTerminal: true })).toBeNull();
   });

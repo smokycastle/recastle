@@ -1,7 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { isMac } from "./platform.js";
 
-// On macOS the window has no title bar of its own: Palace's top bars run to the top
+// On macOS the window has no title bar of its own: Recastle's top bars run to the top
 // edge, with the window buttons in the sidebar's, or with two tabs or more, in the
 // tabs' row (see tauri.macos.conf.json, TabStrip.vue). Their empty parts do what a
 // title bar does: dragging moves the window, and double-clicking zooms it. Screens

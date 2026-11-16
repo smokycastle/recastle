@@ -39,7 +39,7 @@ test("each repository keeps its own pane sizes, one without starting at those la
   a.repository.value = "/b";
   await nextTick();
   expect(a.sizes.history).toBe(400);
-  // Those last set are kept for Palace's next start too.
+  // Those last set are kept for Recastle's next start too.
   expect(saved.get("recastle.paneWidths")).toEqual({ sidebar: 260, history: 400, terminal: 420 });
 });
 

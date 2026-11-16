@@ -1,8 +1,8 @@
-//! Palace's windows, reopened as they were when Palace next starts: each with the tabs
-//! it had, where it was on the screen and how big. They're noted as Palace quits, or its
+//! Recastle's windows, reopened as they were when Recastle next starts: each with the tabs
+//! it had, where it was on the screen and how big. They're noted as Recastle quits, or its
 //! last windows close, and just before it restarts itself, as into an update (see
 //! restart_after_update); the next start takes the note once, however long after. Without
-//! one, as after a crash, Palace opens its first window, with the last repository opened.
+//! one, as after a crash, Recastle opens its first window, with the last repository opened.
 //!
 //! On Linux under Wayland the desktop places windows itself, and doesn't say where
 //! they are, so there they reopen with their tabs and sizes, where it puts them.
@@ -22,9 +22,9 @@ pub(crate) const FILE: &str = if cfg!(debug_assertions) { "reopen-dev.json" } el
 /// Why the windows are noted.
 #[derive(Clone, Copy, PartialEq)]
 pub enum Why {
-    /// Palace is restarting itself, as into an update.
+    /// Recastle is restarting itself, as into an update.
     Restart,
-    /// Palace is quitting, or its last window closing.
+    /// Recastle is quitting, or its last window closing.
     Quit,
 }
 
@@ -33,7 +33,7 @@ pub enum Why {
 static RESTARTING: AtomicBool = AtomicBool::new(false);
 
 /// The windows about to close, their closing not held, by label, each as it was then:
-/// once every window open is, Palace is about to quit with them, and they're noted.
+/// once every window open is, Recastle is about to quit with them, and they're noted.
 /// Several can close at once, as with Close All, each before the others have gone; by
 /// the last, the others can't say where they are any more, so each is placed as it
 /// starts to close.
@@ -66,7 +66,7 @@ struct Placed {
     size: Option<Pair>,
     maximized: bool,
     focused: bool,
-    /// Palace's first window, which goes there again when it can.
+    /// Recastle's first window, which goes there again when it can.
     first: bool,
 }
 
@@ -74,8 +74,8 @@ fn file(app: &AppHandle) -> Option<PathBuf> {
     app.path().app_data_dir().ok().map(|dir| dir.join(FILE))
 }
 
-/// Notes the windows open now, for Palace to reopen as it next starts. Best effort: if
-/// the note can't be written, Palace still goes ahead, and next opens its first window
+/// Notes the windows open now, for Recastle to reopen as it next starts. Best effort: if
+/// the note can't be written, Recastle still goes ahead, and next opens its first window
 /// only. With none open, as once the last has closed, the note there is kept.
 pub fn remember(app: &AppHandle, why: Why) {
     if why == Why::Quit && RESTARTING.load(Ordering::Relaxed) {
@@ -101,7 +101,7 @@ fn write(app: &AppHandle, windows: Vec<Placed>) {
 }
 
 /// The window labeled `window` is about to close, nothing holding it: once every window
-/// open is, they're noted, as Palace quits with the last.
+/// open is, they're noted, as Recastle quits with the last.
 pub fn closing(app: &AppHandle, window: &str) {
     if RESTARTING.load(Ordering::Relaxed) {
         return;
@@ -176,7 +176,7 @@ fn take(path: &Path) -> Vec<Placed> {
         .collect()
 }
 
-/// The windows to open, in order, the first in Palace's first window.
+/// The windows to open, in order, the first in Recastle's first window.
 ///
 /// - A repository is open in one tab at a time, so one noted again, after the first
 ///   time, is left out: both would find it open in the other, and show nothing. A
@@ -256,7 +256,7 @@ fn fit(placed: &Placed, screens: &[Screen]) -> (Option<Pair>, Option<Pair>) {
     (on.and(placed.corner), size)
 }
 
-/// Shows Palace's windows as it starts: the first, and after a restart, the others it
+/// Shows Recastle's windows as it starts: the first, and after a restart, the others it
 /// had, each where it was (see fit), the one in front last in front again, where the
 /// desktop allows it: GNOME under Wayland doesn't let a window be brought forward this
 /// way, and keeps another in front.
@@ -320,7 +320,7 @@ mod tests {
     }
 
     fn note_file(name: &str) -> PathBuf {
-        std::env::temp_dir().join(format!("palace-reopen-{name}-{}.json", std::process::id()))
+        std::env::temp_dir().join(format!("recastle-reopen-{name}-{}.json", std::process::id()))
     }
 
     fn repos(windows: &[Placed]) -> Vec<Vec<&str>> {
@@ -343,7 +343,7 @@ mod tests {
     #[test]
     fn the_note_is_taken_once() {
         let path = note_file("once");
-        let windows = vec![window(&["/code/palace"]), window(&[])];
+        let windows = vec![window(&["/code/recastle"]), window(&[])];
         std::fs::write(&path, serde_json::to_vec(&Note { written: 1000, windows: windows.clone() }).unwrap()).unwrap();
         assert_eq!(take(&path), windows);
         assert!(!path.exists());
@@ -351,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    fn a_note_reopens_whenever_palace_next_starts() {
+    fn a_note_reopens_whenever_recastle_next_starts() {
         let path = note_file("old");
         let windows = vec![window(&["/code/a", "/code/b"])];
         std::fs::write(&path, serde_json::to_vec(&Note { written: 1000, windows: windows.clone() }).unwrap()).unwrap();

@@ -152,7 +152,7 @@ function showWrite() {
   nextTick(() => field.value?.focus());
 }
 
-// Links in the preview open in the browser rather than in Palace's window.
+// Links in the preview open in the browser rather than in Recastle's window.
 function onPreviewClick(event) {
   const anchor = event.target.closest?.("a[href]");
   if (!anchor) return;

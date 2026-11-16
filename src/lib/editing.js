@@ -48,7 +48,7 @@ export const keyFor = (path, file) => `${path}\n${file}`;
 export const isUnsaved = (path, file) => unsaved.has(keyFor(path, file));
 
 /**
- * Notes whether the file has edits that aren't saved, and tells Palace which files
+ * Notes whether the file has edits that aren't saved, and tells Recastle which files
  * have, so quitting from another window can name them.
  */
 export function markUnsaved(path, file, dirty) {

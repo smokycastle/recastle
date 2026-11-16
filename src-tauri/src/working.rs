@@ -482,7 +482,7 @@ pub(crate) fn discard(path: &str, files: &[String], backup: &dyn Fn(&[PathBuf]) 
     // are its own, and moving it to the Trash would take all of it, history included.
     if let Some(folder) = targets.iter().find(|t| workdir.join(t).symlink_metadata().is_ok_and(|m| m.is_dir())) {
         let name = folder.trim_end_matches('/');
-        return Err(format!("{name} is a repository of its own (a submodule), so its changes are inside it. Open it in Palace to discard them there."));
+        return Err(format!("{name} is a repository of its own (a submodule), so its changes are inside it. Open it in Recastle to discard them there."));
     }
     // All at once: on macOS each move to the Trash is the Finder's, with its sound, and
     // discarding many files played it once for each.

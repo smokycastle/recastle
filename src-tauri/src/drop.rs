@@ -1,8 +1,8 @@
 //! Files dragged in from the desktop and dropped on a terminal, where the web view won't
 //! say where they are, as WebKit on macOS may not: the page has their contents, which
-//! Palace saves to a folder of its own under the system's temporary folder, so the
+//! Recastle saves to a folder of its own under the system's temporary folder, so the
 //! terminal can be given a path to them, as for an image for Claude Code to look at.
-//! They're cleared away a day later, when Palace next starts, by when whatever was
+//! They're cleared away a day later, when Recastle next starts, by when whatever was
 //! given them has long read them.
 
 use std::path::{Path, PathBuf};
@@ -29,14 +29,14 @@ pub fn save_dropped_file(request: Request<'_>) -> Result<String, String> {
 }
 
 fn drops_folder() -> PathBuf {
-    std::env::temp_dir().join("palace-drops")
+    std::env::temp_dir().join("recastle-drops")
 }
 
 /// How long a dropped file's copy is kept.
 const KEPT_FOR: Duration = Duration::from_secs(24 * 60 * 60);
 
 /// Clears away the copies of dropped files saved more than a day ago, on a thread of its
-/// own, as Palace starts.
+/// own, as Recastle starts.
 pub fn clear_old() {
     std::thread::spawn(|| clear_older_than(&drops_folder(), SystemTime::now() - KEPT_FOR));
 }
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn clearing_away_copies_saved_more_than_a_day_ago() {
-        let drops = std::env::temp_dir().join(format!("palace-test-drops-{}", std::process::id()));
+        let drops = std::env::temp_dir().join(format!("recastle-test-drops-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&drops);
         let save = |name: &str, age: Duration| {
             let folder = drops.join(name);
@@ -78,7 +78,7 @@ mod tests {
         };
         save("old", KEPT_FOR + Duration::from_secs(60));
         save("new", Duration::from_secs(60));
-        // Something else that's there isn't Palace's to remove.
+        // Something else that's there isn't Recastle's to remove.
         std::fs::write(drops.join("note.txt"), b"").unwrap();
         std::fs::File::open(drops.join("note.txt")).unwrap().set_modified(SystemTime::now() - KEPT_FOR * 2).unwrap();
 

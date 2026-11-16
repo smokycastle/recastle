@@ -2,7 +2,7 @@
 import { FolderX } from "lucide-vue-next";
 
 // Shown when a tab's repository folder is gone: removed as a worktree, or moved or
-// deleted outside Palace. What's on screen is as it was, the terminals' output with it,
+// deleted outside Recastle. What's on screen is as it was, the terminals' output with it,
 // until the tab is closed.
 defineProps({
   name: { type: String, required: true },

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { Star, X } from "lucide-vue-next";
-import { dismissStarRequest, markAsked, starPalace, starRequest } from "../lib/star.js";
+import { dismissStarRequest, markAsked, starRecastle, starRequest } from "../lib/star.js";
 
 // Asks, once, for a star on GitHub. App shows it only while the update notice, which
 // sits in the same corner, isn't showing.
@@ -16,10 +16,10 @@ onMounted(markAsked);
         <strong>Thanks for the star!</strong>
       </template>
       <template v-else>
-        <strong>Enjoying Palace?</strong>
+        <strong>Enjoying Recastle?</strong>
         <span class="dim">A star on GitHub helps other developers find it.</span>
         <div class="actions">
-          <button class="primary-button" :disabled="starRequest === 'starring'" @click="starPalace">
+          <button class="primary-button" :disabled="starRequest === 'starring'" @click="starRecastle">
             {{ starRequest === "starring" ? "Starring…" : "Star on GitHub" }}
           </button>
           <button class="link-button" @click="dismissStarRequest">No Thanks</button>

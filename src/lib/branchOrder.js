@@ -3,7 +3,7 @@ import { keepInSync, readJson, writeJson } from "./storage.js";
 import { buildTree, flattenTree } from "./tree.js";
 
 // The order the sidebar lists local branches in once they've been dragged around, and
-// the dividers between them, per repository. Only Palace's sidebar uses it; git knows
+// the dividers between them, per repository. Only Recastle's sidebar uses it; git knows
 // nothing of it. Branches are the repository's, whichever of its worktrees is open, so
 // `path` is the folder it's known by (see repositoryFolder in recents.js), and its
 // arrangement is the same from each.

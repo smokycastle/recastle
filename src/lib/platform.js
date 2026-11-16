@@ -1,4 +1,4 @@
-// The few places Palace differs between Linux and macOS.
+// The few places Recastle differs between Linux and macOS.
 
 export const isMac = /Mac/.test(navigator.platform || navigator.userAgent);
 

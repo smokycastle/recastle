@@ -227,7 +227,7 @@ describe("a task", () => {
     expect(tell).not.toHaveBeenCalled();
   });
 
-  test("put in the agent's prompt instead, for an agent Palace can't give one to, says to send it", async () => {
+  test("put in the agent's prompt instead, for an agent Recastle can't give one to, says to send it", async () => {
     vi.mocked(terminals.startAgentOn).mockResolvedValueOnce("pasted");
     await panelFor().startTask("Fix the login bug");
     expect(tell).toHaveBeenCalledWith("Send the Task", expect.stringContaining("press Enter"));

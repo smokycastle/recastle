@@ -1,12 +1,12 @@
 name: Bug report
-description: Something in Palace doesn't work as it should.
+description: Something in Recastle doesn't work as it should.
 labels: [bug]
 body:
   - type: textarea
     id: what
     attributes:
       label: What happened
-      description: What you did, what you expected, and what Palace did instead. Screenshots help.
+      description: What you did, what you expected, and what Recastle did instead. Screenshots help.
     validations:
       required: true
   - type: textarea
@@ -20,7 +20,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Palace version
+      label: Recastle version
       description: It's at the top of Settings.
       placeholder: "0.40.0"
     validations:
@@ -28,7 +28,7 @@ body:
   - type: dropdown
     id: install
     attributes:
-      label: How Palace is installed
+      label: How Recastle is installed
       options:
         - macOS (.dmg)
         - Linux (.deb)

@@ -13,10 +13,10 @@ const showing = (tabs) => activeTab(tabs)?.path;
 
 test("a new tab opens after the one showing, named for its repository, and shows", () => {
   const tabs = tabsOf("/code/a", "/code/b");
-  const tab = openTab(tabs, "/code/palace", { task: "Fix the README" });
-  expect(paths(tabs)).toEqual(["/code/a", "/code/palace", "/code/b"]);
-  expect(tab).toMatchObject({ name: "palace", branch: null, task: "Fix the README" });
-  expect(showing(tabs)).toBe("/code/palace");
+  const tab = openTab(tabs, "/code/recastle", { task: "Fix the README" });
+  expect(paths(tabs)).toEqual(["/code/a", "/code/recastle", "/code/b"]);
+  expect(tab).toMatchObject({ name: "recastle", branch: null, task: "Fix the README" });
+  expect(showing(tabs)).toBe("/code/recastle");
   // One to choose a repository in.
   expect(openTab(tabs)).toMatchObject({ path: null, name: null });
 });
@@ -98,13 +98,13 @@ test("a tab remembers every repository it's shown, and closing it leaves those a
 });
 
 test("tabs are named for their repositories, with the folder they're in where two share a name", () => {
-  const tabs = tabsOf("/code/palace", "/work/palace", "/code/shop");
+  const tabs = tabsOf("/code/recastle", "/work/recastle", "/code/shop");
   const [code, work, shop] = tabs.list;
   const empty = openTab(tabs);
   const names = tabNames(tabs.list);
-  expect([code, work, shop, empty].map((tab) => names.get(tab.id))).toEqual(["code/palace", "work/palace", "shop", "New Tab"]);
+  expect([code, work, shop, empty].map((tab) => names.get(tab.id))).toEqual(["code/recastle", "work/recastle", "shop", "New Tab"]);
   closeTab(tabs, work.id);
-  expect(tabNames(tabs.list).get(code.id)).toBe("palace");
+  expect(tabNames(tabs.list).get(code.id)).toBe("recastle");
   expect(tabNames(tabs.list).get(shop.id)).toBe("shop");
   expect(tabNames(tabs.list).get(empty.id)).toBe("New Tab");
 });
@@ -142,18 +142,18 @@ test("a tab reopens known as it was, a worktree in its repository's color, until
 });
 
 test("a repository's color is the same every time, its worktrees' its own, and repositories have several", () => {
-  const color = tabColor({ path: "/code/palace", home: "/code/palace" });
+  const color = tabColor({ path: "/code/recastle", home: "/code/recastle" });
   expect(color).toBeGreaterThanOrEqual(1);
   expect(color).toBeLessThanOrEqual(6);
-  expect(tabColor({ path: "/code/palace" })).toBe(color);
-  expect(tabColor({ path: "/code/palace-tabs", home: "/code/palace" })).toBe(color);
+  expect(tabColor({ path: "/code/recastle" })).toBe(color);
+  expect(tabColor({ path: "/code/recastle-tabs", home: "/code/recastle" })).toBe(color);
   const many = new Set(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"].map((name) => tabColor({ path: `/code/${name}` })));
   expect(many.size).toBeGreaterThan(3);
   expect(tabColor({ path: null, home: null })).toBeNull();
 });
 
 test("a repository's tile has its name's first letter or digit", () => {
-  expect(tabInitial("palace")).toBe("P");
+  expect(tabInitial("recastle")).toBe("R");
   expect(tabInitial(".dotfiles")).toBe("D");
   expect(tabInitial("2048-game")).toBe("2");
   expect(tabInitial("élan")).toBe("É");

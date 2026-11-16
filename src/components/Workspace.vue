@@ -210,7 +210,7 @@ const isGitHub = computed(() => selected.value === "workspace:github");
 const isFullView = computed(() => isSettings.value || isGitHub.value);
 // The GitHub view opened from the welcome screen, before any repository is open.
 const browsingGitHub = ref(false);
-// Settings opened from the welcome screen, as by About Palace.
+// Settings opened from the welcome screen, as by About Recastle.
 const browsingSettings = ref(false);
 const settingsView = ref(null);
 const isStashes = computed(() => selected.value === "workspace:stashes");
@@ -337,7 +337,7 @@ function onIssueCreated(issue) {
 }
 
 // From "#123" in a commit message to that issue: in the Issues view, or on GitHub
-// when Palace isn't signed in.
+// when Recastle isn't signed in.
 async function showIssue(number) {
   const repo = issueRepo.value ?? issueRemotes.value[0];
   if (!repo) return;
@@ -614,7 +614,7 @@ const REMOTE_TITLES = {
 const runRemote = (kind) => runGit(REMOTE_TITLES[kind], kind);
 
 // Fetch, and Cmd+R (Ctrl+R), reload the repository at once, then fetch from its
-// remotes, which reloads it again with what came in. Otherwise Palace keeps itself
+// remotes, which reloads it again with what came in. Otherwise Recastle keeps itself
 // current: the file watcher, coming back to the window and background fetches.
 function refreshAndFetch() {
   refresh();
@@ -867,7 +867,7 @@ watch(
 function showTitle() {
   if (!props.active) return;
   const path = overview.value?.path;
-  thisWindow.setTitle(path ? `${folderName(path)} — Palace` : "Palace").catch(() => {});
+  thisWindow.setTitle(path ? `${folderName(path)} — Recastle` : "Recastle").catch(() => {});
 }
 watch(() => props.active, showTitle);
 
@@ -928,7 +928,7 @@ const thisWindow = getCurrentWebviewWindow();
 const unlistenChanges = thisWindow.listen("repo-changed", ({ payload }) => payload.path === overview.value?.path && refresh());
 onBeforeUnmount(() => unlistenChanges.then((unlisten) => unlisten()));
 
-// About Palace, from the menu: the top of Settings, in the repository open, or with
+// About Recastle, from the menu: the top of Settings, in the repository open, or with
 // none, on its own.
 useAppMenu({
   window: thisWindow,
@@ -1242,7 +1242,7 @@ async function start() {
   // Closed while it opened, there's nothing left to show it in: no agent's started.
   if (gone) return;
   if (!overview.value) emit("shows", null);
-  // Repositories deleted since Palace last ran are taken off the list, once, without
+  // Repositories deleted since Recastle last ran are taken off the list, once, without
   // holding up what's opened.
   if (props.first) forgetGoneRepositories().then(() => (recents.value = recentRepositories()));
   // Opened for a task (New Agent Task): its agent starts on it, or, with the worktree not
@@ -1253,7 +1253,7 @@ async function start() {
 }
 
 // Done once it's started, whether it opened anything or not. A tab behind the one
-// showing, as tabs reopen as Palace starts, starts as it's first shown: not all at once,
+// showing, as tabs reopen as Recastle starts, starts as it's first shown: not all at once,
 // each loading its repository, watching it and fetching in the background.
 let started;
 onMounted(() => (started = firstShown().then(() => !gone && start())));
@@ -1277,11 +1277,11 @@ onMounted(() => {
     title: "Couldn't read your saved settings",
     state: "failed",
     message:
-      `${storeProblem}\n\nUntil Palace restarts, changes to settings, recent repositories and the like aren't ` +
+      `${storeProblem}\n\nUntil Recastle restarts, changes to settings, recent repositories and the like aren't ` +
       "saved, so what's there isn't overwritten. If restarting doesn't help, Start Fresh renames the file, " +
       "keeping it, and saves the settings in use now in its place.",
     actions: [
-      { label: "Restart Palace", run: () => invoke("restart_after_update") },
+      { label: "Restart Recastle", run: () => invoke("restart_after_update") },
       {
         label: "Start Fresh",
         run: async () => {
@@ -1603,7 +1603,7 @@ const breadcrumb = computed(() => {
         @count="openIssues = $event"
         @created="onIssueCreated"
       />
-      <!-- While Palace checks whether the repository is a fork. -->
+      <!-- While Recastle checks whether the repository is a fork. -->
       <div v-else-if="isIssues || isPulls" class="empty-state"><Spinner /></div>
       <StashList
         v-else-if="isStashes"

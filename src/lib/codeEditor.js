@@ -8,11 +8,11 @@ import { HighlightStyle, indentUnit, LanguageDescription, syntaxHighlighting } f
 import { languages } from "@codemirror/language-data";
 import { tags as t } from "@lezer/highlight";
 
-// The Files view's editor: CodeMirror, in Palace's colors and fonts, loaded the first
+// The Files view's editor: CodeMirror, in Recastle's colors and fonts, loaded the first
 // time a file is opened there. Each file's editor state is made here; FileEditor.vue
 // shows one at a time and keeps those with edits that aren't saved.
 
-// Palace's colors, which follow its theme, so the editor needs no theme of its own.
+// Recastle's colors, which follow its theme, so the editor needs no theme of its own.
 const theme = EditorView.theme({
   "&": {
     height: "100%",
@@ -128,7 +128,7 @@ const theme = EditorView.theme({
   },
 });
 
-// Code in the colors the rest of Palace uses for it (see styles.css).
+// Code in the colors the rest of Recastle uses for it (see styles.css).
 const highlighting = HighlightStyle.define([
   { tag: [t.keyword, t.modifier, t.operatorKeyword, t.controlKeyword, t.definitionKeyword, t.moduleKeyword, t.self], color: "var(--syntax-keyword)" },
   { tag: [t.string, t.special(t.string), t.regexp, t.character], color: "var(--syntax-string)" },
@@ -580,7 +580,7 @@ export async function loadLanguage(view, file, stillShown) {
   return description.name;
 }
 
-/** Applies Palace's settings for tab width, syntax highlighting and wrapping long lines. */
+/** Applies Recastle's settings for tab width, syntax highlighting and wrapping long lines. */
 export function applySettings(view, { tabSize, highlight, wrap }) {
   view.dispatch({
     effects: [

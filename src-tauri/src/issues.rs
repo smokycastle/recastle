@@ -431,19 +431,19 @@ mod tests {
     #[test]
     fn searching_a_repository() {
         assert_eq!(
-            search_path("tim", "palace", "issue", "is:open label:\"good first issue\"", 2, None),
-            "/search/issues?q=repo%3Atim%2Fpalace%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22\
+            search_path("tim", "recastle", "issue", "is:open label:\"good first issue\"", 2, None),
+            "/search/issues?q=repo%3Atim%2Frecastle%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22\
              &per_page=50&page=2&sort=created&order=desc"
         );
         // Words to match are sorted by how well they match.
-        assert!(!search_path("tim", "palace", "pr", "is:open crash", 1, None).contains("sort="));
-        assert!(search_path("tim", "palace", "pr", "", 1, None).contains("is%3Apr"));
+        assert!(!search_path("tim", "recastle", "pr", "is:open crash", 1, None).contains("sort="));
+        assert!(search_path("tim", "recastle", "pr", "", 1, None).contains("is%3Apr"));
         // Even when an order is chosen.
         let updated = Order { by: "updated", oldest: false };
-        assert!(!search_path("tim", "palace", "issue", "is:open crash", 1, Some(updated)).contains("sort="));
-        assert!(search_path("tim", "palace", "issue", "is:open", 1, Some(updated)).ends_with("&sort=updated&order=desc"));
+        assert!(!search_path("tim", "recastle", "issue", "is:open crash", 1, Some(updated)).contains("sort="));
+        assert!(search_path("tim", "recastle", "issue", "is:open", 1, Some(updated)).ends_with("&sort=updated&order=desc"));
         let oldest = Order { by: "created", oldest: true };
-        assert!(search_path("tim", "palace", "issue", "", 1, Some(oldest)).ends_with("&sort=created&order=asc"));
+        assert!(search_path("tim", "recastle", "issue", "", 1, Some(oldest)).ends_with("&sort=created&order=asc"));
         assert_eq!(terms(r#"is:open  label:"good first issue" crash"#), ["is:open", r#"label:"good first issue""#, "crash"]);
     }
 
@@ -464,7 +464,7 @@ mod tests {
             "user": { "login": "octocat", "avatar_url": "https://a" },
             "labels": [{ "name": "bug", "color": "d73a4a", "description": null }],
             "assignees": [], "comments": 2, "created_at": "2026-10-01T00:00:00Z", "closed_at": null,
-            "html_url": "https://github.com/tim/palace/issues/7", "body_html": "<p>Hi</p>",
+            "html_url": "https://github.com/tim/recastle/issues/7", "body_html": "<p>Hi</p>",
             "reactions": { "total_count": 0 }
         }))
         .unwrap();

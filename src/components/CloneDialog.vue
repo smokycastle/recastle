@@ -53,7 +53,7 @@ function onKeydown(event) {
   <div class="backdrop" @mousedown.self="closeCloneDialog(null)" @keydown="onKeydown">
     <form class="dialog" @keydown="submitOnEnter" @submit.prevent="submit">
       <header>
-        <img src="/palace.svg" alt="" class="app-icon" />
+        <img src="/recastle.svg" alt="" class="app-icon" />
         <div>
           <h2>Clone Repository</h2>
           <p>Copies a repository to your computer and opens it.</p>

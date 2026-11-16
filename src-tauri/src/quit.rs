@@ -1,5 +1,5 @@
 //! Closing a window, or quitting, with work that would be lost: programs running in
-//! terminals, or edits in the Files view that aren't saved. Palace asks first, in the
+//! terminals, or edits in the Files view that aren't saved. Recastle asks first, in the
 //! window being closed, or for quitting, the one in front, naming what's at stake, and
 //! goes ahead only if told to.
 
@@ -25,13 +25,13 @@ pub struct Unsaved {
 }
 /// When a page was last asked, until it says it's asking the user. A page that never
 /// says so, broken or still loading, can't ask, so trying again goes ahead rather than
-/// leaving Palace impossible to close.
+/// leaving Recastle impossible to close.
 static UNANSWERED: Mutex<Option<Instant>> = Mutex::new(None);
 const PAGE_ANSWERS_WITHIN: Duration = Duration::from_secs(2);
 
 #[derive(Serialize, Clone)]
 struct Held {
-    /// Whether Palace is quitting, rather than only this window closing.
+    /// Whether Recastle is quitting, rather than only this window closing.
     quitting: bool,
     /// This window's terminals with programs running in them.
     terminals: Vec<u32>,
@@ -82,7 +82,7 @@ pub fn hold(app: &AppHandle, window: Option<&str>) -> bool {
     unanswered.get_or_insert_with(Instant::now);
     drop(unanswered);
     // Asked where it's seen: quitting with every window minimized, or hidden, the one
-    // asked would otherwise ask out of sight, and Palace seem not to quit.
+    // asked would otherwise ask out of sight, and Recastle seem not to quit.
     if let Some(window) = app.get_webview_window(&asking) {
         let _ = window.unminimize();
         let _ = window.show();
@@ -138,13 +138,13 @@ mod tests {
     #[test]
     fn edits_not_saved_in_a_repository_or_one_in_a_folder_of_it_are_found_in_any_window() {
         let unsaved = |path: &str, described: &str| Unsaved { path: path.into(), described: described.into() };
-        UNSAVED.lock().unwrap().insert("test-unsaved-1".into(), vec![unsaved("/code/palace-unsaved", "“a.rs” in palace")]);
-        UNSAVED.lock().unwrap().insert("test-unsaved-2".into(), vec![unsaved("/code/palace-unsaved/inner", "“b.rs” in inner"), unsaved("/code/other-unsaved", "“c.rs” in other")]);
-        let mut found = unsaved_under("/code/palace-unsaved");
+        UNSAVED.lock().unwrap().insert("test-unsaved-1".into(), vec![unsaved("/code/recastle-unsaved", "“a.rs” in recastle")]);
+        UNSAVED.lock().unwrap().insert("test-unsaved-2".into(), vec![unsaved("/code/recastle-unsaved/inner", "“b.rs” in inner"), unsaved("/code/other-unsaved", "“c.rs” in other")]);
+        let mut found = unsaved_under("/code/recastle-unsaved");
         found.sort();
-        assert_eq!(found, ["“a.rs” in palace", "“b.rs” in inner"]);
+        assert_eq!(found, ["“a.rs” in recastle", "“b.rs” in inner"]);
         // A folder that only starts the same way isn't one in it.
-        assert!(unsaved_under("/code/palace").is_empty());
+        assert!(unsaved_under("/code/recastle").is_empty());
         forget("test-unsaved-1");
         forget("test-unsaved-2");
     }

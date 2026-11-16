@@ -943,7 +943,7 @@ mod tests {
 
     #[test]
     fn what_palace_kept_for_undo_goes_with_recastle_s_on_the_next_run() {
-        let t = TempRepo::new("undo-palace-kept");
+        let t = TempRepo::new("undo-recastle-kept");
         let first = t.commit(&[("a.txt", Some("a\n"))], "First");
         t.repo.reference(&format!("{PALACE_KEPT}{first}"), first, true, "Kept by Palace for undo").unwrap();
         t.repo.reference(&format!("{KEPT}{first}"), first, true, "Kept by Recastle for undo").unwrap();
@@ -1091,7 +1091,7 @@ mod tests {
     }
 
     // A step on every changed file, as Reset keeping changes, ends the merge, so its
-    // conflicts could never be put back: it isn't undoable, and Palace says so first.
+    // conflicts could never be put back: it isn't undoable, and Recastle says so first.
     #[test]
     fn every_changed_file_isnt_covered_while_a_conflict_is_under_way() {
         use crate::cli::git;

@@ -25,7 +25,7 @@ pub async fn fetch(window: WebviewWindow, path: String, remote: Option<String>) 
 }
 
 /// Fetches all remotes without showing progress or asking for credentials, to keep
-/// ahead and behind counts current while Palace is open.
+/// ahead and behind counts current while Recastle is open.
 #[tauri::command]
 pub async fn fetch_in_background(window: WebviewWindow, path: String) -> Result<String, String> {
     in_background(window, path.clone(), move |running, _| fetch_unattended(&path, running)).await
@@ -718,8 +718,8 @@ mod tests {
 
     #[test]
     fn a_rewritten_pull_request_palace_checked_out_is_known_by_what_palace_noted() {
-        let server = TempRepo::bare("palace-noted-pull-server");
-        let t = TempRepo::clone_of("palace-noted-pull", &server);
+        let server = TempRepo::bare("recastle-noted-pull-server");
+        let t = TempRepo::clone_of("recastle-noted-pull", &server);
         t.commit(&[("a.txt", Some("1\n"))], "First");
         let main = t.branch();
         crate::cli::git(t.path(), &["push", "-q", "origin", &main], None).unwrap();
@@ -1097,7 +1097,7 @@ mod tests {
     #[test]
     fn cloning_into_a_new_folder() {
         let (server, _local) = setup("clone");
-        let dest = std::env::temp_dir().join(format!("palace-clone-{}/owner/repo", std::process::id()));
+        let dest = std::env::temp_dir().join(format!("recastle-clone-{}/owner/repo", std::process::id()));
         let _ = std::fs::remove_dir_all(dest.parent().unwrap().parent().unwrap());
 
         let url = server.path().to_string();

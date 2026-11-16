@@ -1,4 +1,4 @@
-// Whether Palace can see what Claude Code in a terminal tab is doing. Claude Code says
+// Whether Recastle can see what Claude Code in a terminal tab is doing. Claude Code says
 // what it's doing with the Program Status Protocol (see programStatus.js), and keeps a
 // report standing for as long as its own session is in front: idle, at its prompt, or
 // working, finished or needing the user. In front with none standing, it isn't saying:

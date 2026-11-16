@@ -1,10 +1,10 @@
-# Palace
+# Recastle
 
 A Tauri desktop Git client: a Vue 3 page in `src/` and a Rust backend in
 `src-tauri/src/`. Read [ARCHITECTURE.md](ARCHITECTURE.md) before changing how things are
 structured; it says where code belongs and why.
 
-**Palace is meant to keep improving for years without breaking or getting messy, so
+**Recastle is meant to keep improving for years without breaking or getting messy, so
 maintainability comes before speed.** When there's a choice, prefer the change that's
 easier to understand, test and change later: fix the cause rather than work around it,
 reuse what's there rather than add a second way, and leave code you touched at least as

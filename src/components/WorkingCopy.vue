@@ -397,7 +397,7 @@ function folderPaths(node, path) {
 const shownOrder = computed(() => rows.value.filter((row) => row.file).map((row) => row.file));
 
 // Alt-clicking (Option-clicking on a Mac) opens or closes the folders in it too. On a
-// Mac the click may not say Option is held, so Palace is asked (keys.rs).
+// Mac the click may not say Option is held, so Recastle is asked (keys.rs).
 async function toggleFolder(row, event) {
   folderCursor.value = row.folder;
   chosen.value = new Set();

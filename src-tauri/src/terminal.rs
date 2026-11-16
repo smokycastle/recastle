@@ -1,4 +1,4 @@
-//! Terminals in Palace's panel: the user's shell in a pseudo-terminal, started in the
+//! Terminals in Recastle's panel: the user's shell in a pseudo-terminal, started in the
 //! repository's folder. What it prints streams to the panel as it comes, as bytes, and
 //! what's typed there is written back.
 
@@ -29,7 +29,7 @@ struct Terminal {
 static TERMINALS: LazyLock<Mutex<HashMap<u32, Terminal>>> = LazyLock::new(Default::default);
 static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 
-/// What Palace may have inherited from the terminal or IDE it was started in, which
+/// What Recastle may have inherited from the terminal or IDE it was started in, which
 /// would tell programs in its terminals they're in that one: Claude Code, say, takes
 /// itself to be in RustRover's terminal, connected to it, and reads keys as there.
 const INHERITED: &[&str] = &[
@@ -99,14 +99,14 @@ fn open(
     command.cwd(&path);
     command.env("TERM", "xterm-256color");
     command.env("COLORTERM", "truecolor");
-    // Programs that adapt to the terminal they're in should know it's Palace's, not
-    // the one Palace may have been started from.
-    command.env("TERM_PROGRAM", "Palace");
+    // Programs that adapt to the terminal they're in should know it's Recastle's, not
+    // the one Recastle may have been started from.
+    command.env("TERM_PROGRAM", "Recastle");
     command.env("TERM_PROGRAM_VERSION", env!("CARGO_PKG_VERSION"));
     for var in INHERITED.iter().copied() {
         command.env_remove(var);
     }
-    // Claude Code's own, from a session Palace was started in: Claude Code in Palace's
+    // Claude Code's own, from a session Recastle was started in: Claude Code in Recastle's
     // terminals would take itself for part of that session.
     for (var, _) in std::env::vars_os() {
         if var.to_str().is_some_and(|var| var.starts_with("CLAUDE_CODE_")) {
@@ -121,7 +121,7 @@ fn open(
         }
     }
 
-    // After what's inherited is let go, which includes a task of the terminal Palace
+    // After what's inherited is let go, which includes a task of the terminal Recastle
     // was started from.
     if let Some(task) = task {
         command.env("RECASTLE_TASK", &task);
@@ -171,7 +171,7 @@ fn open(
 }
 
 /// Types `data` into the terminal: keys pressed, or text pasted. It's queued, so a
-/// program that isn't reading doesn't hold up Palace.
+/// program that isn't reading doesn't hold up Recastle.
 #[tauri::command]
 pub async fn terminal_write(id: u32, data: String) -> Result<(), String> {
     let terminals = TERMINALS.lock().unwrap();
@@ -255,7 +255,7 @@ fn program_name(_pid: i32) -> Option<String> {
     None
 }
 
-/// Whether `program` can be run in a terminal: found on Palace's PATH, where installers
+/// Whether `program` can be run in a terminal: found on Recastle's PATH, where installers
 /// usually put it, or on the PATH the user's shell sets up, which an app started from
 /// the desktop may not have. When it can't tell, it says yes, leaving the terminal to
 /// say otherwise.
@@ -440,7 +440,7 @@ fn still_running(_id: i32, _group: bool) -> bool {
 
 /// How to undo the AppImage's environment for the shell: each variable to remove (None)
 /// or set. Inside the AppImage, it points GTK and GLib at the libraries and schemas
-/// bundled with Palace, which would break programs from the system started in a
+/// bundled with Recastle, which would break programs from the system started in a
 /// terminal. Nothing outside the AppImage.
 #[cfg(not(target_os = "macos"))]
 fn app_image_env() -> Vec<(&'static str, Option<std::ffi::OsString>)> {
@@ -483,7 +483,7 @@ mod tests {
 
     #[test]
     fn a_shell_starts_in_the_folder_and_takes_what_is_typed() {
-        let dir = std::env::temp_dir().join(format!("palace-test-terminal-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-terminal-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
 
@@ -521,7 +521,7 @@ mod tests {
 
     #[test]
     fn naming_the_program_in_front() {
-        let dir = std::env::temp_dir().join(format!("palace-test-terminal-front-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-terminal-front-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let (id, _printed) = open_collecting(&dir.to_string_lossy());
@@ -543,7 +543,7 @@ mod tests {
 
     #[test]
     fn closing_a_folders_terminals_waits_for_what_they_run_to_stop() {
-        let dir = std::env::temp_dir().join(format!("palace-test-terminal-close-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-terminal-close-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         // In a folder of its own, so closing what's in it hangs up no other test's
         // terminals; started in a folder inside that, as a worktree's terminal can be.
@@ -589,7 +589,7 @@ mod tests {
     fn finding_programs() {
         assert!(available("sh"));
         assert!(available("/bin/sh"));
-        assert!(!available("palace-no-such-program"));
+        assert!(!available("recastle-no-such-program"));
         assert!(!available("/no/such/program"));
         assert!(!available("  "));
         // Relative to wherever it's run, so not something to check here.
@@ -598,7 +598,7 @@ mod tests {
 
     #[test]
     fn giving_a_task_to_the_shell_as_it_is() {
-        let dir = std::env::temp_dir().join(format!("palace-test-terminal-task-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-terminal-task-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         // What a shell would read if it were typed: quotes, a trailing backslash,
@@ -651,7 +651,7 @@ mod tests {
 
     #[test]
     fn pasting_into_a_program_that_isnt_reading_holds_up_nothing_else() {
-        let dir = std::env::temp_dir().join(format!("palace-test-terminal-paste-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-terminal-paste-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.to_string_lossy().into_owned();

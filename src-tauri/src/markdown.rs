@@ -41,7 +41,7 @@ fn render(repository: &Path, file: &str, text: &str) -> String {
         // A task list's boxes, which can't be ticked here.
         .add_tag_attributes("input", &["type", "checked", "disabled"])
         .add_tag_attributes("details", &["open"])
-        // Runs after links have been checked, so only images Palace reads become data.
+        // Runs after links have been checked, so only images Recastle reads become data.
         .attribute_filter(move |element, attribute, value| match (element, attribute) {
             ("img", "src") | ("source", "srcset") => Some(Cow::Owned(image_source(&repository, &folder, value).unwrap_or_default())),
             ("input", "type") => (value == "checkbox").then(|| value.into()),
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn showing_images_from_the_repository() {
-        let dir = std::env::temp_dir().join(format!("palace-test-markdown-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-test-markdown-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("docs/images")).unwrap();
         std::fs::write(dir.join("docs/images/shot.png"), b"png!").unwrap();

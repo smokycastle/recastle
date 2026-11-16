@@ -1,9 +1,9 @@
-//! Signing in to GitHub with a personal access token, so Palace can fetch, pull and
+//! Signing in to GitHub with a personal access token, so Recastle can fetch, pull and
 //! push without git having its own GitHub login (such as the GitHub CLI's).
 //!
-//! The token is kept in the system keyring. While signed in, Palace tells each git
-//! it runs to ask Palace itself for github.com credentials: the helper is this same
-//! program, started as `palace git-credential get`. Nothing outside Palace changes;
+//! The token is kept in the system keyring. While signed in, Recastle tells each git
+//! it runs to ask Recastle itself for github.com credentials: the helper is this same
+//! program, started as `recastle git-credential get`. Nothing outside Recastle changes;
 //! git in a terminal keeps using whatever it's set up with.
 
 use serde::{Deserialize, Serialize};
@@ -89,7 +89,7 @@ pub async fn github_account() -> Option<Account> {
     saved().map(|s| s.account)
 }
 
-/// Checks `token` with GitHub and, if it works, keeps it for Palace's git commands.
+/// Checks `token` with GitHub and, if it works, keeps it for Recastle's git commands.
 #[tauri::command]
 pub async fn github_sign_in(token: String) -> Result<Account, String> {
     let token = token.trim().to_string();
@@ -228,7 +228,7 @@ pub(crate) async fn blocking<T: Send + 'static>(work: impl FnOnce() -> Result<T,
 fn agent() -> ureq::Agent {
     ureq::Agent::config_builder()
         .timeout_global(Some(Duration::from_secs(20)))
-        .user_agent("Palace")
+        .user_agent("Recastle")
         .http_status_as_error(false)
         .build()
         .into()
@@ -406,17 +406,17 @@ pub async fn github_delete_key(id: u64) -> Result<(), String> {
     blocking(move || api(&token, Method::Delete, &format!("/user/keys/{id}"))).await
 }
 
-// Palace's own repository, which Palace asks people to star once.
-const PALACE_REPO: &str = "smokycastle/recastle";
+// Recastle's own repository, which Recastle asks people to star once.
+const RECASTLE_REPO: &str = "smokycastle/recastle";
 
-/// Whether the signed-in account has starred Palace's repository. None when GitHub
+/// Whether the signed-in account has starred Recastle's repository. None when GitHub
 /// won't say, as for fine-grained tokens without the starring permission.
 #[tauri::command]
-pub async fn github_starred_palace() -> Result<Option<bool>, String> {
+pub async fn github_starred_recastle() -> Result<Option<bool>, String> {
     let token = saved().ok_or(NOT_SIGNED_IN)?.token;
     blocking(move || {
         let response = agent()
-            .get(&format!("https://api.github.com/user/starred/{PALACE_REPO}"))
+            .get(&format!("https://api.github.com/user/starred/{RECASTLE_REPO}"))
             .header("Accept", "application/vnd.github+json")
             .header("Authorization", format!("Bearer {token}"))
             .call()
@@ -435,11 +435,11 @@ fn starred_from(status: u16) -> Option<bool> {
     }
 }
 
-/// Stars Palace's repository as the signed-in account.
+/// Stars Recastle's repository as the signed-in account.
 #[tauri::command]
-pub async fn github_star_palace() -> Result<(), String> {
+pub async fn github_star_recastle() -> Result<(), String> {
     let token = saved().ok_or(NOT_SIGNED_IN)?.token;
-    blocking(move || api(&token, Method::Put(None), &format!("/user/starred/{PALACE_REPO}"))).await
+    blocking(move || api(&token, Method::Put(None), &format!("/user/starred/{RECASTLE_REPO}"))).await
 }
 
 /// A public key in ~/.ssh, offered when adding a key to GitHub.
@@ -481,7 +481,7 @@ fn read_public_keys(dir: &std::path::Path) -> Vec<LocalKey> {
     keys
 }
 
-/// The `-c` options that make git ask Palace for github.com credentials, or none when
+/// The `-c` options that make git ask Recastle for github.com credentials, or none when
 /// not signed in. They replace any other github.com helper for that one command.
 pub(crate) fn git_config_args() -> Vec<String> {
     if !SIGNED_IN.load(Ordering::Relaxed) {
@@ -503,8 +503,8 @@ fn helper_args(exe: &str) -> Vec<String> {
     ]
 }
 
-/// Runs as git's credential helper: `palace git-credential <get|store|erase>`. Only
-/// "get" does anything; Palace's token is managed in Palace, not by git.
+/// Runs as git's credential helper: `recastle git-credential <get|store|erase>`. Only
+/// "get" does anything; Recastle's token is managed in Recastle, not by git.
 pub fn credential_helper(action: Option<&str>) -> i32 {
     if action != Some("get") {
         return 0;
@@ -637,7 +637,7 @@ mod tests {
 
     #[test]
     fn finding_local_public_keys() {
-        let dir = std::env::temp_dir().join(format!("palace-ssh-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("recastle-ssh-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("id_ed25519.pub"), "ssh-ed25519 AAAAC3Nz tim@laptop\n").unwrap();
         std::fs::write(dir.join("id_ed25519"), "-----BEGIN OPENSSH PRIVATE KEY-----\n").unwrap();
@@ -663,18 +663,18 @@ mod tests {
 
     #[test]
     fn the_helper_replaces_other_github_helpers() {
-        let args = helper_args("/opt/it's here/palace");
+        let args = helper_args("/opt/it's here/recastle");
         assert_eq!(args[1], "credential.https://github.com.helper=");
-        assert_eq!(args[3], r"credential.https://github.com.helper=!'/opt/it'\''s here/palace' git-credential");
+        assert_eq!(args[3], r"credential.https://github.com.helper=!'/opt/it'\''s here/recastle' git-credential");
     }
 
     #[test]
     fn git_asks_the_helper_for_github_credentials() {
-        // A stand-in helper script, set up the way Palace sets up its own.
-        let dir = std::env::temp_dir().join(format!("palace-helper-{}", std::process::id()));
+        // A stand-in helper script, set up the way Recastle sets up its own.
+        let dir = std::env::temp_dir().join(format!("recastle-helper-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let script = dir.join("helper.sh");
-        // Started as "<script> git-credential get", like Palace would be.
+        // Started as "<script> git-credential get", like Recastle would be.
         std::fs::write(&script, "#!/bin/sh\n[ \"$2\" = get ] && printf 'username=octocat\\npassword=ghp_secret\\n'\n").unwrap();
         std::process::Command::new("chmod").arg("+x").arg(&script).status().unwrap();
 

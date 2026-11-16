@@ -250,7 +250,7 @@ impl Api {
     fn new(token: Option<String>) -> Self {
         let config = ureq::Agent::config_builder()
             .timeout_global(Some(Duration::from_secs(10)))
-            .user_agent("Palace")
+            .user_agent("Recastle")
             .build();
         Api { agent: config.into(), token }
     }
@@ -303,13 +303,13 @@ mod tests {
 
     #[test]
     fn reading_github_remotes() {
-        let expected = Some(("timmcleod".to_string(), "palace".to_string()));
-        assert_eq!(parse_github_url("https://github.com/timmcleod/palace.git"), expected);
-        assert_eq!(parse_github_url("https://github.com/timmcleod/palace"), expected);
-        assert_eq!(parse_github_url("https://someone@github.com/timmcleod/palace/"), expected);
-        assert_eq!(parse_github_url("git@github.com:timmcleod/palace.git"), expected);
-        assert_eq!(parse_github_url("ssh://git@github.com/timmcleod/palace"), expected);
-        assert_eq!(parse_github_url("https://gitlab.com/timmcleod/palace.git"), None);
+        let expected = Some(("timmcleod".to_string(), "recastle".to_string()));
+        assert_eq!(parse_github_url("https://github.com/timmcleod/recastle.git"), expected);
+        assert_eq!(parse_github_url("https://github.com/timmcleod/recastle"), expected);
+        assert_eq!(parse_github_url("https://someone@github.com/timmcleod/recastle/"), expected);
+        assert_eq!(parse_github_url("git@github.com:timmcleod/recastle.git"), expected);
+        assert_eq!(parse_github_url("ssh://git@github.com/timmcleod/recastle"), expected);
+        assert_eq!(parse_github_url("https://gitlab.com/timmcleod/recastle.git"), None);
         assert_eq!(parse_github_url("https://github.com/timmcleod"), None);
     }
 
@@ -334,7 +334,7 @@ mod tests {
         // Every TempRepo commit has the same author, so they're listed once.
         assert_eq!(recent_authors(&t.repo).len(), 1);
 
-        t.repo.remote("origin", "git@github.com:timmcleod/palace.git").unwrap();
-        assert_eq!(github_remote(&t.repo), Some(("timmcleod".into(), "palace".into())));
+        t.repo.remote("origin", "git@github.com:timmcleod/recastle.git").unwrap();
+        assert_eq!(github_remote(&t.repo), Some(("timmcleod".into(), "recastle".into())));
     }
 }

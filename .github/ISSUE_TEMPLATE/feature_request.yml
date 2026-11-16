@@ -1,5 +1,5 @@
 name: Feature request
-description: Something you'd like Palace to do.
+description: Something you'd like Recastle to do.
 labels: [enhancement]
 body:
   - type: textarea
@@ -13,4 +13,4 @@ body:
     id: idea
     attributes:
       label: What would help
-      description: How you picture Palace doing it, if you have an idea.
+      description: How you picture Recastle doing it, if you have an idea.

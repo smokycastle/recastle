@@ -143,7 +143,7 @@ const canDrag = (row) => canMerge(row) || canMove(row);
 // Whether the dragged branch is over the Branches header, to create a branch from it.
 const overBranches = ref(false);
 // Whether Alt is held, which makes a merge a rebase. On macOS, with the mouse button
-// down, the page's events say it isn't, and pressing it isn't heard, so Palace asks its
+// down, the page's events say it isn't, and pressing it isn't heard, so Recastle asks its
 // own process (keys.rs), as the pointer moves and every so often while it's still.
 const altHeld = ref(false);
 let askingAlt = false;
@@ -579,7 +579,7 @@ function onRowClick(row, event) {
   flex-shrink: 0;
 }
 
-/* With the window's top drawn by Palace (macOS), the name sits 2px below the middle of
+/* With the window's top drawn by Recastle (macOS), the name sits 2px below the middle of
    its bar, set by eye. */
 :root[data-title-bar="overlay"] .sidebar-toolbar {
   padding-top: 4px;

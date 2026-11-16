@@ -13,8 +13,8 @@ test("files dragged in, as macOS and Linux each say so", () => {
   expect(draggingFiles(drag("text/uri-list"))).toBe(true);
 });
 
-test("not Palace's own drags, nor text, nor nothing", () => {
-  expect(draggingFiles(drag("application/x-palace-commit", "text/plain"))).toBe(false);
+test("not Recastle's own drags, nor text, nor nothing", () => {
+  expect(draggingFiles(drag("application/x-recastle-commit", "text/plain"))).toBe(false);
   expect(draggingFiles(drag("text/plain"))).toBe(false);
   expect(draggingFiles(null)).toBe(false);
 });

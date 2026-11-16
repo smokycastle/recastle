@@ -33,7 +33,7 @@ export function useTabs({ window }) {
   const opened = computed(() => [...tabs.list].sort((a, b) => a.id - b.id));
   const many = computed(() => tabs.list.length > 1);
 
-  // What the window starts with: the tabs it had, as when its page reloads or Palace
+  // What the window starts with: the tabs it had, as when its page reloads or Recastle
   // reopens it as it starts; or in the first window, the last repository opened; or
   // one tab, to choose a repository in.
   async function start() {
