@@ -361,7 +361,7 @@ pub async fn github_delete_key(id: u64) -> Result<(), String> {
 }
 
 // Palace's own repository, which Palace asks people to star once.
-const PALACE_REPO: &str = "timmcleod/palace";
+const PALACE_REPO: &str = "smokycastle/recastle";
 
 /// Whether the signed-in account has starred Palace's repository. None when GitHub
 /// won't say, as for fine-grained tokens without the starring permission.

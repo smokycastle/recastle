@@ -29,7 +29,7 @@ export const updateNoticeShown = computed(
     (updates.state === "error" && updates.version && !updates.dismissed),
 );
 
-const RELEASES = "https://github.com/timmcleod/palace/releases";
+const RELEASES = "https://github.com/smokycastle/recastle/releases";
 export const releaseNotesUrl = (version) => `${RELEASES}/tag/v${version}`;
 
 const FIRST_CHECK = 5 * 1000;

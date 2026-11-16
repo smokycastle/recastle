@@ -11,7 +11,7 @@
   <br>
   For Linux and macOS.<br>
   <a href="https://timmcleod.github.io/palace/"><strong>Website</strong></a> ·
-  <a href="https://github.com/timmcleod/palace/releases/latest"><strong>Download</strong></a> ·
+  <a href="https://github.com/smokycastle/recastle/releases/latest"><strong>Download</strong></a> ·
   <a href="LICENSE">MIT license</a>
 </p>
 
@@ -48,7 +48,7 @@ Palace updates itself when a new release comes out, and whenever it starts, reop
 
 ## Install
 
-Download the latest package from [Releases](https://github.com/timmcleod/palace/releases/latest).
+Download the latest package from [Releases](https://github.com/smokycastle/recastle/releases/latest).
 
 ### Linux
 

@@ -65,5 +65,5 @@ test("ends with the copyright and license, as the system's About panel had them"
   const colophon = document.querySelector(".colophon");
   expect(colophon.textContent).toContain("Copyright © 2026 Tim McLeod");
   [...colophon.querySelectorAll("button")].find((b) => b.textContent === "MIT License").click();
-  expect(openUrl).toHaveBeenCalledWith("https://github.com/timmcleod/palace/blob/main/LICENSE");
+  expect(openUrl).toHaveBeenCalledWith("https://github.com/smokycastle/recastle/blob/main/LICENSE");
 });

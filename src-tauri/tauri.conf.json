@@ -37,7 +37,7 @@
     "publisher": "Tim McLeod",
     "copyright": "Copyright © 2026 Tim McLeod",
     "license": "MIT",
-    "homepage": "https://github.com/timmcleod/palace",
+    "homepage": "https://github.com/smokycastle/recastle",
     "icon": [
       "icons/32x32.png",
       "icons/64x64.png",
@@ -57,7 +57,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEIxRDQwNTZEQkYyNkRCQTYKUldTbTJ5YS9iUVhVc2E0RlhRcEVqNjdZbEhCalpCRlROa0tweFZRajN2WmpCbmw1RDZSY0JoRWsK",
       "endpoints": [
-        "https://github.com/timmcleod/palace/releases/latest/download/latest.json"
+        "https://github.com/smokycastle/recastle/releases/latest/download/latest.json"
       ]
     }
   }
