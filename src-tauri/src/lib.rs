@@ -73,7 +73,7 @@ pub fn run() {
                     no_pinch_zoom(window);
                 }
             }
-            // What Palace saved, before anything's read from where Recastle keeps it.
+            // What earlier versions saved, before anything's read from where Recastle keeps it.
             migrate::bring_over(app.handle());
             #[cfg(target_os = "macos")]
             menu::set(app.handle())?;

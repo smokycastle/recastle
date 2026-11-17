@@ -4,7 +4,7 @@ version = "0.47.1"
 description = "Run your agent, review its work, ship it"
 authors = ["Tim McLeod"]
 license = "MIT"
-repository = "https://github.com/smokycastle/recastle"
+repository = "https://github.com/timmcleod/recastle"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

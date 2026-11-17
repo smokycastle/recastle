@@ -1,13 +1,15 @@
-//! What Palace left, brought over as Recastle starts. Palace became Recastle, with a
-//! new app ID, and so new folders for its saved data and its cache: the saved settings,
-//! recent repositories and the like (see store.rs), the windows to reopen (see
-//! reopen.rs) and the authors' pictures found (see avatars.rs) are copied from Palace's
-//! as Recastle first starts without its own. Copied, not moved, so Palace's are there
-//! still, as they were, should it be opened again.
+//! What earlier versions left, brought over as Recastle starts. The app ID has changed
+//! twice, from Palace's to Recastle's first one as Palace became Recastle, then to
+//! Recastle's own as the repository moved, and with it the folders for the saved data
+//! and the cache: the saved settings, recent repositories and the like (see store.rs),
+//! the windows to reopen (see reopen.rs) and the authors' pictures found (see
+//! avatars.rs) are copied from the latest earlier folders as Recastle first starts
+//! without its own. Copied, not moved, so the earlier ones are there still, as they
+//! were, should an earlier version be opened again.
 //!
 //! It goes by what's there, not by which version came before, so it's the same for
-//! someone coming from any version of Palace, however many releases they skipped.
-//! Kept for at least a year after the rename (2026-11), for those slow to update.
+//! someone coming from any version, however many releases they skipped. Kept for at
+//! least a year after the last change (2026-11), for those slow to update.
 
 use std::path::Path;
 use tauri::{AppHandle, Manager};
@@ -15,17 +17,29 @@ use tauri::{AppHandle, Manager};
 /// Palace's app ID, which named its folders.
 const PALACE_ID: &str = "com.timmcleod.palace";
 
-/// Copies over what Palace saved, where Recastle has nothing of its own yet; and as it
-/// first does, its GitHub sign-in too.
+/// The app IDs before this one, which named the folders, latest first: Recastle's first,
+/// from before the repository moved, then Palace's.
+const EARLIER_IDS: [&str; 2] = ["com.smokycastle.recastle", PALACE_ID];
+
+/// Copies over what the latest earlier version saved, where Recastle has nothing of its
+/// own yet; and from Palace, its GitHub sign-in too. Recastle's own sign-in is kept by
+/// name, not in a folder, so it stays as it is.
 pub fn bring_over(app: &AppHandle) {
     if let Ok(data) = app.path().app_data_dir()
-        && copy_over(&palace_folder(&data), &data, &[crate::store::FILE, crate::reopen::FILE])
+        && copy_latest(&data, &[crate::store::FILE, crate::reopen::FILE]) == Some(PALACE_ID)
     {
         crate::github::bring_over_palace_sign_in();
     }
     if let Ok(cache) = app.path().app_cache_dir() {
-        copy_over(&palace_folder(&cache), &cache, &[crate::avatars::CACHE_FILE]);
+        copy_latest(&cache, &[crate::avatars::CACHE_FILE]);
     }
+}
+
+/// Copies `files` into `folder`, one of Recastle's, from the folder beside it that the
+/// latest earlier version had for the same, as copy_over does: so from Palace's only
+/// where there's nothing of Recastle's first app ID. The app ID copied from, if any.
+fn copy_latest(folder: &Path, files: &[&str]) -> Option<&'static str> {
+    EARLIER_IDS.into_iter().find(|id| copy_over(&folder.with_file_name(id), folder, files))
 }
 
 /// On macOS, the app's own bundle, renamed from Palace.app to Recastle.app, and Recastle
@@ -64,16 +78,11 @@ fn move_bundle(exe: &Path) -> Option<std::path::PathBuf> {
     Some(to.join(exe.strip_prefix(bundle).ok()?))
 }
 
-/// The folder beside `folder`, one of Recastle's, that Palace had for the same: named
-/// after its app ID, as Recastle's after its own.
-fn palace_folder(folder: &Path) -> std::path::PathBuf {
-    folder.with_file_name(PALACE_ID)
-}
-
 /// Copies `files` from the folder `from` into `to`, once: only while `to` hasn't the
 /// first of them, the one that says whether anything's been saved there, and `from`
-/// has it. So nothing of Recastle's own is replaced, nor Palace's brought back once
-/// Recastle's has been used up, as the windows to reopen are once they've reopened.
+/// has it. So nothing of Recastle's own is replaced, nor an earlier version's brought
+/// back once Recastle's has been used up, as the windows to reopen are once they've
+/// reopened.
 /// Best effort: what can't be copied is left, and Recastle starts without it. Says
 /// whether it copied them.
 fn copy_over(from: &Path, to: &Path, files: &[&str]) -> bool {
@@ -94,6 +103,9 @@ fn copy_over(from: &Path, to: &Path, files: &[&str]) -> bool {
 mod tests {
     use super::*;
 
+    /// The app ID now, from tauri.conf.json.
+    const RECASTLE_ID: &str = "com.timmcleod.recastle";
+
     // An empty folder of its own for each test.
     fn folder(name: &str) -> std::path::PathBuf {
         let dir = std::env::temp_dir().join(format!("recastle-migrate-{name}-{}", std::process::id()));
@@ -105,11 +117,10 @@ mod tests {
     #[test]
     fn palace_s_saved_data_is_copied_into_recastle_s_once_and_left_where_it_was() {
         let root = folder("once");
-        let (palace, recastle) = (root.join(PALACE_ID), root.join("com.smokycastle.recastle"));
+        let (palace, recastle) = (root.join(PALACE_ID), root.join(RECASTLE_ID));
         std::fs::create_dir_all(&palace).unwrap();
         std::fs::write(palace.join("saved.json"), "{\"palace.settings\":{}}").unwrap();
         std::fs::write(palace.join("reopen.json"), "{\"windows\":[]}").unwrap();
-        assert_eq!(palace_folder(&recastle), palace);
 
         assert!(copy_over(&palace, &recastle, &["saved.json", "reopen.json"]));
         assert_eq!(std::fs::read_to_string(recastle.join("saved.json")).unwrap(), "{\"palace.settings\":{}}");
@@ -153,7 +164,7 @@ mod tests {
     #[test]
     fn nothing_s_copied_without_palace_s_or_when_they_re_one_folder() {
         let root = folder("none");
-        let (palace, recastle) = (root.join(PALACE_ID), root.join("com.smokycastle.recastle"));
+        let (palace, recastle) = (root.join(PALACE_ID), root.join(RECASTLE_ID));
         copy_over(&palace, &recastle, &["saved.json"]);
         assert!(!recastle.exists());
         // Before the app ID changes, its folder is Palace's: there's nothing to copy.
@@ -161,6 +172,31 @@ mod tests {
         std::fs::write(palace.join("saved.json"), "{}").unwrap();
         copy_over(&palace, &palace, &["saved.json"]);
         assert_eq!(std::fs::read_dir(&palace).unwrap().count(), 1);
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn what_s_saved_is_copied_from_the_latest_earlier_folder() {
+        let root = folder("latest");
+        let recastle = root.join(RECASTLE_ID);
+        let write = |id: &str, json: &str| {
+            std::fs::create_dir_all(root.join(id)).unwrap();
+            std::fs::write(root.join(id).join("saved.json"), json).unwrap();
+        };
+        write(PALACE_ID, "{\"from\":\"palace\"}");
+
+        // From Palace's, without Recastle's first app ID's folder: the sign-in comes too.
+        assert_eq!(copy_latest(&recastle, &["saved.json"]), Some(PALACE_ID));
+        assert_eq!(std::fs::read_to_string(recastle.join("saved.json")).unwrap(), "{\"from\":\"palace\"}");
+
+        // With both, from Recastle's first app ID's, though Palace's is there too.
+        std::fs::remove_dir_all(&recastle).unwrap();
+        write(EARLIER_IDS[0], "{\"from\":\"recastle\"}");
+        assert_eq!(copy_latest(&recastle, &["saved.json"]), Some(EARLIER_IDS[0]));
+        assert_eq!(std::fs::read_to_string(recastle.join("saved.json")).unwrap(), "{\"from\":\"recastle\"}");
+
+        // Once Recastle has its own, nothing.
+        assert_eq!(copy_latest(&recastle, &["saved.json"]), None);
         std::fs::remove_dir_all(&root).unwrap();
     }
 }

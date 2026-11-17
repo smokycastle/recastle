@@ -407,7 +407,7 @@ pub async fn github_delete_key(id: u64) -> Result<(), String> {
 }
 
 // Recastle's own repository, which Recastle asks people to star once.
-const RECASTLE_REPO: &str = "smokycastle/recastle";
+const RECASTLE_REPO: &str = "timmcleod/recastle";
 
 /// Whether the signed-in account has starred Recastle's repository. None when GitHub
 /// won't say, as for fine-grained tokens without the starring permission.

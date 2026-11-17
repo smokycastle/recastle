@@ -9,7 +9,7 @@ import { readJson, writeJson } from "./storage.js";
 // already. Not before it has been in use for a day, though, so someone trying it for
 // the first time isn't asked before they know whether they like it. Settings has a
 // link for anyone who'd rather do it later.
-export const RECASTLE_URL = "https://github.com/smokycastle/recastle";
+export const RECASTLE_URL = "https://github.com/timmcleod/recastle";
 
 const ASKED_KEY = "recastle.starAsked";
 const FIRST_STARTED_KEY = "recastle.firstStarted";

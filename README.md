@@ -10,15 +10,15 @@
   Your agent writes the code. Recastle shows you what changed. You decide what gets shipped.
   <br>
   For Linux and macOS.<br>
-  <a href="https://smokycastle.github.io/recastle/"><strong>Website</strong></a> ·
-  <a href="https://github.com/smokycastle/recastle/releases/latest"><strong>Download</strong></a> ·
+  <a href="https://timmcleod.github.io/recastle/"><strong>Website</strong></a> ·
+  <a href="https://github.com/timmcleod/recastle/releases/latest"><strong>Download</strong></a> ·
   <a href="LICENSE">MIT license</a>
 </p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://smokycastle.github.io/recastle/assets/hero-dark.webp?v=3">
-    <img src="https://smokycastle.github.io/recastle/assets/hero-light.webp?v=3" width="900" alt="Recastle showing a repository's Working Copy and the diff of a changed file, with Claude Code running in a Claude tab below">
+    <source media="(prefers-color-scheme: dark)" srcset="https://timmcleod.github.io/recastle/assets/hero-dark.webp?v=3">
+    <img src="https://timmcleod.github.io/recastle/assets/hero-light.webp?v=3" width="900" alt="Recastle showing a repository's Working Copy and the diff of a changed file, with Claude Code running in a Claude tab below">
   </picture>
 </p>
 
@@ -44,11 +44,11 @@ When your agent writes the code, your job changes: less typing, more steering, r
 - **GitHub:** sign in to see the repository's issues and pull requests in the sidebar: filter, comment, label, create pull requests and merge them. Clone your repositories, create new ones and manage SSH keys.
 - **Real Git underneath:** Recastle runs your own `git` for every change, so your hooks, commit signing, SSH agent, credential helpers and `.gitconfig` work exactly as they do in a terminal.
 
-Recastle updates itself when a new release comes out, and whenever it starts, reopens your windows and their tabs as they were. See the [website](https://smokycastle.github.io/recastle/) for a tour.
+Recastle updates itself when a new release comes out, and whenever it starts, reopens your windows and their tabs as they were. See the [website](https://timmcleod.github.io/recastle/) for a tour.
 
 ## Install
 
-Download the latest package from [Releases](https://github.com/smokycastle/recastle/releases/latest).
+Download the latest package from [Releases](https://github.com/timmcleod/recastle/releases/latest).
 
 ### Linux
 
