@@ -28,6 +28,42 @@ pub fn bring_over(app: &AppHandle) {
     }
 }
 
+/// On macOS, the app's own bundle, renamed from Palace.app to Recastle.app, and Recastle
+/// started again from there. Palace updated itself into Recastle in place, keeping its
+/// file's name, which the Dock and Finder go by. Done as it starts, before anything's
+/// noted where it is: Tauri notes its path once, to install updates and to give git as
+/// the credential helper (see github.rs), so it can't move while it runs. Where it can't
+/// be renamed, as without permission, or run from its disk image, it's left as it is.
+#[cfg(target_os = "macos")]
+pub fn rename_app_bundle() {
+    let Ok(exe) = std::env::current_exe() else { return };
+    let Some(moved) = move_bundle(&exe) else { return };
+    let args: Vec<_> = std::env::args_os().skip(1).collect();
+    if std::process::Command::new(&moved).args(args).spawn().is_ok() {
+        std::process::exit(0);
+    }
+    // Not to be started from there: put back, to go on as it was.
+    if let (Some(from), Some(to)) = (exe.ancestors().nth(3), moved.ancestors().nth(3)) {
+        let _ = std::fs::rename(to, from);
+    }
+}
+
+/// Renames the app bundle the program at `exe` is in, …/Palace.app/Contents/MacOS/…, to
+/// Recastle.app beside it, unless there's one already. The program's path once it has,
+/// or None, where it isn't in Palace.app or couldn't be renamed.
+#[cfg(any(target_os = "macos", test))]
+fn move_bundle(exe: &Path) -> Option<std::path::PathBuf> {
+    let bundle = exe.ancestors().nth(3)?;
+    if bundle.file_name()? != "Palace.app" {
+        return None;
+    }
+    let to = bundle.with_file_name("Recastle.app");
+    if to.exists() || std::fs::rename(bundle, &to).is_err() {
+        return None;
+    }
+    Some(to.join(exe.strip_prefix(bundle).ok()?))
+}
+
 /// The folder beside `folder`, one of Recastle's, that Palace had for the same: named
 /// after its app ID, as Recastle's after its own.
 fn palace_folder(folder: &Path) -> std::path::PathBuf {
@@ -86,6 +122,31 @@ mod tests {
         assert!(!copy_over(&palace, &recastle, &["saved.json", "reopen.json"]));
         assert!(!recastle.join("reopen.json").exists());
         assert_eq!(std::fs::read_to_string(recastle.join("saved.json")).unwrap(), "{\"recastle.settings\":{}}");
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    // A bundle at `name` in `root`, with its program in it, and that program's path.
+    fn bundle(root: &Path, name: &str) -> std::path::PathBuf {
+        let exe = root.join(name).join("Contents/MacOS/recastle");
+        std::fs::create_dir_all(exe.parent().unwrap()).unwrap();
+        std::fs::write(&exe, "").unwrap();
+        exe
+    }
+
+    #[test]
+    fn palace_app_is_renamed_recastle_app_unless_there_s_one() {
+        let root = folder("bundle");
+        let exe = bundle(&root, "Palace.app");
+        assert_eq!(move_bundle(&exe), Some(root.join("Recastle.app/Contents/MacOS/recastle")));
+        assert!(!root.join("Palace.app").exists());
+        assert!(root.join("Recastle.app/Contents/MacOS/recastle").exists());
+
+        // Already Recastle.app, or with one beside it, or not in a bundle: as it is.
+        assert_eq!(move_bundle(&root.join("Recastle.app/Contents/MacOS/recastle")), None);
+        let other = bundle(&root, "Palace.app");
+        assert_eq!(move_bundle(&other), None);
+        assert!(other.exists());
+        assert_eq!(move_bundle(&root.join("target/debug/recastle")), None);
         std::fs::remove_dir_all(&root).unwrap();
     }
 

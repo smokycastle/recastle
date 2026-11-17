@@ -46,6 +46,9 @@ mod worktree;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // First of all, before anything notes where it is (see migrate.rs).
+    #[cfg(target_os = "macos")]
+    migrate::rename_app_bundle();
     #[cfg(target_os = "macos")]
     shell_path::adopt_login_path();
     github::load();
