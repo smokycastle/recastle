@@ -22,8 +22,7 @@ fn file(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(dir.join(FILE))
 }
 
-/// Everything saved, or None before anything has been (the first start, or the first
-/// since Palace kept these in the web view's storage).
+/// Everything saved, or None before anything has been, as on the first start.
 #[tauri::command]
 pub fn load_store(app: AppHandle, store: tauri::State<Store>) -> Result<Option<Map<String, Value>>, String> {
     let read = read(&file(&app)?);

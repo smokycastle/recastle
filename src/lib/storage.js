@@ -30,40 +30,20 @@ export function fromPalace(values) {
   );
 }
 
-// Before 0.11.3, these were kept in the web view's storage.
-function fromWebView() {
-  const found = {};
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key?.startsWith("palace.")) continue;
-      try {
-        found[key] = JSON.parse(localStorage.getItem(key));
-      } catch {
-        // Unreadable: left behind.
-      }
-    }
-  } catch {
-    // No web view storage at all.
-  }
-  return found;
-}
-
 export async function loadStore() {
   try {
     values = (await invoke("load_store")) ?? {};
   } catch (e) {
     storeProblem = String(e);
-    values = fromWebView();
-    Object.assign(values, fromPalace(values));
+    values = {};
     return;
   }
-  // Keys are never removed, so one the file doesn't have yet was never copied over.
-  const missing = Object.fromEntries(Object.entries(fromWebView()).filter(([key]) => !(key in values)));
-  Object.assign(missing, fromPalace({ ...values, ...missing }));
-  if (Object.keys(missing).length) {
-    Object.assign(values, missing);
-    save(missing);
+  // Palace's values, as Recastle first loads the file migrate.rs copied over, kept as
+  // Recastle's so they're taken only once.
+  const palace = fromPalace(values);
+  if (Object.keys(palace).length) {
+    Object.assign(values, palace);
+    save(palace);
   }
 }
 

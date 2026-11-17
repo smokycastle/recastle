@@ -9,7 +9,7 @@
   <strong>Run your agent. Review its work. Ship it.</strong><br>
   Your agent writes the code. Recastle shows you what changed. You decide what gets shipped.
   <br>
-  For Linux and macOS. Formerly Palace.<br>
+  For Linux and macOS.<br>
   <a href="https://smokycastle.github.io/recastle/"><strong>Website</strong></a> ·
   <a href="https://github.com/smokycastle/recastle/releases/latest"><strong>Download</strong></a> ·
   <a href="LICENSE">MIT license</a>
