@@ -173,6 +173,23 @@ test("showing a tab of a repository that isn't open opens it first", async () =>
   expect(groups["/other"].active).toBe(7);
 });
 
+test("coming to show, its terminal takes the keys, where the panel's open", async () => {
+  const showing = ref(false);
+  const { open, panel } = panelFor("/repo", { active: () => showing.value });
+  open.value = true;
+  showing.value = true;
+  await settle();
+  expect(panel.value.focus).toHaveBeenCalledTimes(1);
+  // Hidden, then shown with the panel closed: it isn't opened, or focused.
+  showing.value = false;
+  open.value = false;
+  await settle();
+  showing.value = true;
+  await settle();
+  expect(panel.value.focus).toHaveBeenCalledTimes(1);
+  expect(open.value).toBe(false);
+});
+
 test("notices are for the workspace showing only", async () => {
   let showing = false;
   const notice = { window: "main", path: "/repo", key: 3, state: "done", title: "Agent finished" };

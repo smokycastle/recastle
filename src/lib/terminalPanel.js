@@ -1,4 +1,4 @@
-import { nextTick, onBeforeUnmount, ref } from "vue";
+import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { tell } from "./overlays.js";
 import { settings } from "./settings.js";
@@ -23,6 +23,10 @@ export function useTerminalPanel({ overview, loadRepository, window, active = ()
   // hidden panel's button can say so.
   const unseen = ref(false);
   const panel = ref(null);
+
+  // Coming to show, as its window tab's clicked, the keys go to its terminal, where the
+  // panel's open: to the agent or shell left there, to go on with.
+  watch(active, (now) => now && open.value && panel.value?.focus());
 
   function reveal() {
     open.value = true;

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { createApp, h, nextTick } from "vue";
+import { createApp, h, nextTick, ref } from "vue";
 import { FILTER_RECENTS } from "../lib/recents.js";
+import { provideActive } from "../lib/activeWorkspace.js";
 import WelcomeView from "./WelcomeView.vue";
 
 // recents.js, for FILTER_RECENTS, reads storage.js, which listens for Recastle's other windows as it loads.
@@ -14,13 +15,15 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-// Mounts the screen with `props`, and records what it emits.
-function show(props) {
+// Mounts the screen with `props`, in a workspace that's showing while `active()`, and
+// records what it emits.
+function show(props, active = () => true) {
   const emitted = [];
   const on = (name) => (...args) => emitted.push([name, ...args]);
   const root = document.createElement("div");
   document.body.append(root);
   app = createApp({
+    setup: () => provideActive(active),
     render: () =>
       h(WelcomeView, {
         recents: [],
@@ -39,6 +42,23 @@ const repos = (n) => Array.from({ length: n }, (_, i) => ({ name: `repo-${i}`, p
 const rowNames = (root) => [...root.querySelectorAll(".recent .recent-text > div:first-child")].map((d) => d.textContent);
 
 describe("WelcomeView", () => {
+  test("the field to find a repository has the keys as it shows, as for a new tab, but not in a tab behind", async () => {
+    const { root } = show({ recents: repos(FILTER_RECENTS + 1) });
+    await nextTick();
+    expect(document.activeElement).toBe(root.querySelector(".recent-filter"));
+    app.unmount();
+    document.body.innerHTML = "";
+
+    const showing = ref(false);
+    const behind = show({ recents: repos(FILTER_RECENTS + 1) }, () => showing.value);
+    await nextTick();
+    expect(document.activeElement).not.toBe(behind.root.querySelector(".recent-filter"));
+    // Its tab coming to show, it has them.
+    showing.value = true;
+    await nextTick();
+    expect(document.activeElement).toBe(behind.root.querySelector(".recent-filter"));
+  });
+
   test("shows only a spinner while the last repository reopens", () => {
     const { root } = show({ starting: true, recents: repos(2) });
     expect(root.querySelector(".starting")).not.toBeNull();

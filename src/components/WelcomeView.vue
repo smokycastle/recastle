@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import { CircleAlert, FolderGit2, X } from "lucide-vue-next";
 import Spinner from "./Spinner.vue";
 import { FILTER_RECENTS } from "../lib/recents.js";
+import { inActiveWorkspace } from "../lib/activeWorkspace.js";
 
 // The screen with no repository open: opening or cloning one, or one of the recent
 // repositories. While the last repository reopens at startup, only a spinner.
@@ -33,6 +34,16 @@ watch(
   { flush: "post" },
 );
 const recentQuery = ref("");
+
+// The field to find one in has the keys as the screen shows, as for a new tab, so the
+// repository's name can be typed straight away; and again as its tab comes to show.
+const active = inActiveWorkspace();
+const recentFilter = ref(null);
+watch(
+  () => active() && recentFilter.value,
+  (field) => field && field.focus(),
+  { flush: "post" },
+);
 const shownRecents = computed(() => {
   const words = recentQuery.value.toLowerCase().split(/\s+/).filter(Boolean);
   return props.recents.filter((repo) => {
@@ -69,6 +80,7 @@ function openFirstRecent() {
         <div class="recents-title">Recent</div>
         <input
           v-if="recents.length > FILTER_RECENTS"
+          ref="recentFilter"
           v-model="recentQuery"
           class="recent-filter"
           type="text"
