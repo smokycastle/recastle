@@ -22,14 +22,21 @@ const error = ref("");
 const busy = ref(false);
 const loadingAll = ref(null);
 
+// Reads are numbered as they start, and the one showing is the latest to have come
+// back. While an agent works, refreshes can come faster than the diff is read, each
+// starting another read: one only the latest started could show, none would.
 let loadSeq = 0;
+let shownSeq = 0;
 // The sides shown in full with Show All, which a refresh reads in full again, rather
 // than cutting them short once more: true, or "trying" until a read in full has
 // worked. Each file starts cut short.
 let inFull = { staged: false, unstaged: false };
 watch(
   () => props.file.path,
-  () => (inFull = { staged: false, unstaged: false }),
+  () => {
+    inFull = { staged: false, unstaged: false };
+    loadingAll.value = null;
+  },
 );
 
 function fetchDiff(staged, maxLines) {
@@ -42,39 +49,45 @@ function fetchDiff(staged, maxLines) {
   });
 }
 
-// Reads the diffs, each side cut short unless it's asked for in full. Show All's
-// spinner stops with the read that's last asked for.
+// Reads the diffs, each side cut short unless it's asked for in full, and shows them
+// unless a newer read has shown already, or another file's been chosen meanwhile.
 async function load() {
   const seq = ++loadSeq;
+  const path = props.file.path;
+  const full = { staged: !!inFull.staged, unstaged: !!inFull.unstaged };
+  const isLatest = () => {
+    if (seq < shownSeq || props.file.path !== path) return false;
+    shownSeq = seq;
+    return true;
+  };
   try {
     const [staged, unstaged] = await Promise.all([
-      props.file.staged ? fetchDiff(true, inFull.staged ? null : MAX_LINES) : null,
-      props.file.unstaged ? fetchDiff(false, inFull.unstaged ? null : MAX_LINES) : null,
+      props.file.staged ? fetchDiff(true, full.staged ? null : MAX_LINES) : null,
+      props.file.unstaged ? fetchDiff(false, full.unstaged ? null : MAX_LINES) : null,
     ]);
-    if (seq !== loadSeq) return;
+    if (!isLatest()) return;
     // A refresh, as when the window comes forward, mostly reads the same diffs again:
     // the ones on screen stay, rather than redrawing (see keepUnchanged).
     const before = diffs.value;
     const next = { staged: keepUnchanged(before.staged, staged), unstaged: keepUnchanged(before.unstaged, unstaged) };
     if (next.staged !== before.staged || next.unstaged !== before.unstaged) diffs.value = next;
     error.value = "";
-    settleTrying(true);
+    settleTrying(full, true);
   } catch (e) {
-    if (seq !== loadSeq) return;
+    if (!isLatest()) return;
     error.value = String(e);
-    settleTrying(false);
-  } finally {
-    if (seq === loadSeq) loadingAll.value = null;
+    settleTrying(full, false);
   }
 }
 
-// Show All's sides stay in full once the read that's last asked for, Show All's own or
-// a refresh in its place, has worked, and if it failed, go back to being cut short:
-// read in full every time after, they'd show the same error.
-function settleTrying(worked) {
+// Show All's sides stay in full once a read of them in full, Show All's own or a
+// refresh in its place, has shown, and if it failed, go back to being cut short: read
+// in full every time after, they'd show the same error. Its spinner stops then too.
+function settleTrying(full, worked) {
   for (const side of ["staged", "unstaged"]) {
-    if (inFull[side] === "trying") inFull = { ...inFull, [side]: worked };
+    if (full[side] && inFull[side] === "trying") inFull = { ...inFull, [side]: worked };
   }
+  if (loadingAll.value !== null && full[loadingAll.value ? "staged" : "unstaged"]) loadingAll.value = null;
 }
 
 // The status list hands over a new file object whenever it reloads, which is

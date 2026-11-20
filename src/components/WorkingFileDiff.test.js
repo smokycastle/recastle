@@ -65,6 +65,38 @@ test("keeps the diff on screen, and the lines picked in it, when a refresh reads
   expect(document.querySelectorAll(".picked").length).toBeGreaterThan(0);
 });
 
+// While an agent works, its changes refresh the list again and again, each reading the
+// diff afresh, sometimes before the read before has come back.
+test("shows each read as it comes back, though a refresh has started another meanwhile", async () => {
+  const pending = [];
+  const file = await mount(() => new Promise((resolve) => pending.push(resolve)));
+  file.value = changed("src/notes.js");
+  await settle();
+  expect(pending).toHaveLength(2);
+
+  pending[0](diff());
+  await settle();
+  expect(document.querySelector("table")).not.toBeNull();
+
+  // The newer one, coming back after, takes its place.
+  pending[1]({ ...diff(), hunks: [{ header: "@@ -1 +1 @@", lines: [line("+", null, 1, "newer")] }] });
+  await settle();
+  expect(document.body.textContent).toContain("newer");
+});
+
+test("a read that comes back after a newer one has shown doesn't take its place", async () => {
+  const pending = [];
+  const file = await mount(() => new Promise((resolve) => pending.push(resolve)));
+  file.value = changed("src/notes.js");
+  await settle();
+  pending[1]({ ...diff(), hunks: [{ header: "@@ -1 +1 @@", lines: [line("+", null, 1, "newer")] }] });
+  await settle();
+  pending[0]({ ...diff(), hunks: [{ header: "@@ -1 +1 @@", lines: [line("+", null, 1, "older")] }] });
+  await settle();
+  expect(document.body.textContent).toContain("newer");
+  expect(document.body.textContent).not.toContain("older");
+});
+
 test("a diff shown in full stays in full when a refresh reads it again", async () => {
   // Cut short when a most is asked for, as a large one is.
   const file = await mount(({ maxLines }) => (maxLines == null ? diff() : { ...diff(), truncated: true, hunks: [] }));
