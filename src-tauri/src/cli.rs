@@ -49,8 +49,10 @@ pub(crate) fn git_in(dir: &Path, args: &[&str]) -> Result<String, String> {
     if output.status.success() { Ok(stdout) } else { Err(join_output(&stderr, &stdout)) }
 }
 
-/// The oldest git Recastle works with: `git pull --autostash` needs 2.27 when merging.
-const MINIMUM_GIT: (u32, u32) = (2, 27);
+/// The oldest git Recastle works with: `git fetch --no-write-fetch-head` needs 2.29, for
+/// fetching a pull request's commits alongside a pull (see pulls.rs), which reads
+/// FETCH_HEAD; and `git pull --autostash` needs 2.27 when merging.
+const MINIMUM_GIT: (u32, u32) = (2, 29);
 
 #[derive(serde::Serialize, Debug, PartialEq)]
 pub struct GitCheck {
@@ -106,7 +108,15 @@ fn check_version(output: Option<&str>) -> GitCheck {
 
 /// The git process currently doing network work, so it can be canceled.
 #[derive(Default)]
-pub struct Running(pub(crate) Mutex<Option<u32>>);
+pub struct Running(Mutex<Slot>);
+
+#[derive(Default)]
+struct Slot {
+    /// The process running, if any.
+    pid: Option<u32>,
+    /// Closed for good (see Running::close): nothing more is to run on it.
+    closed: bool,
+}
 
 /// The network work of each repository a window has open (see per_repo.rs): one fetch,
 /// pull or push at a time in each, while other repositories go on with theirs.
@@ -137,8 +147,29 @@ impl Runnings {
 
 impl Running {
     /// Stops the running process and anything it started (ssh, credential helpers).
+    /// What runs on it after still runs.
     pub(crate) fn cancel(&self) {
-        if let Some(pid) = *self.0.lock().unwrap() {
+        Self::stop(&self.0.lock().unwrap());
+    }
+
+    /// Stops what's running, as `cancel` does, and what was to run on it but hasn't
+    /// started yet, which fails with CANCELED instead: for work that's been asked for
+    /// and may not have got as far as starting git, as while it asks GitHub something
+    /// first. Not for one that's used again, as each repository's fetches are.
+    pub(crate) fn close(&self) {
+        let mut slot = self.0.lock().unwrap();
+        slot.closed = true;
+        Self::stop(&slot);
+    }
+
+    /// Whether a process is running on it.
+    #[cfg(test)]
+    pub(crate) fn is_running(&self) -> bool {
+        self.0.lock().unwrap().pid.is_some()
+    }
+
+    fn stop(slot: &Slot) {
+        if let Some(pid) = slot.pid {
             #[cfg(unix)]
             // Each git runs in its own session, so its process group holds exactly
             // git and its helpers.
@@ -176,19 +207,69 @@ pub(crate) fn git_with_progress_in(
 /// Runs git with nobody watching, as background fetches do: anything that would ask
 /// for a password or passphrase fails instead of opening a prompt.
 pub(crate) fn git_unattended(path: &str, args: &[&str], running: &Running) -> Result<String, String> {
+    run_with_progress(unattended(path, args)?, running, |_| {})
+}
+
+/// What git_unattended_within fails with when it's stopped for going quiet.
+pub(crate) const STALLED: &str = "Stalled.";
+
+/// `git_unattended`, on `running` of its own rather than as one of the repository's
+/// fetches, pulls and pushes, and stopped once it's gone `quiet` without a word of
+/// progress, as over a stalled connection, failing with STALLED: one that's slow but
+/// getting somewhere goes on. For network work nobody watches, so pass `--progress`.
+/// Canceled with `running`, it fails with CANCELED.
+pub(crate) fn git_unattended_within(
+    path: &str,
+    args: &[&str],
+    quiet: std::time::Duration,
+    running: &std::sync::Arc<Running>,
+) -> Result<String, String> {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::mpsc::{RecvTimeoutError, channel};
+    let command = unattended(path, args)?;
+    let stalled = std::sync::Arc::new(AtomicBool::new(false));
+    let (progress, heard) = channel::<()>();
+    let (timer, timed_out) = (std::sync::Arc::clone(running), std::sync::Arc::clone(&stalled));
+    std::thread::spawn(move || {
+        loop {
+            match heard.recv_timeout(quiet) {
+                Ok(()) => continue,
+                Err(RecvTimeoutError::Timeout) => {
+                    timed_out.store(true, Ordering::SeqCst);
+                    break timer.cancel();
+                }
+                // Git's done.
+                Err(RecvTimeoutError::Disconnected) => break,
+            }
+        }
+    });
+    let result = run_with_progress(command, running, move |_| {
+        let _ = progress.send(());
+    });
+    match result {
+        Err(e) if e == crate::errors::CANCELED && stalled.load(Ordering::SeqCst) => Err(STALLED.to_string()),
+        result => result,
+    }
+}
+
+/// git, to run with nobody watching (see git_unattended).
+fn unattended(path: &str, args: &[&str]) -> Result<Command, String> {
     let mut command = command(&workdir(path)?, args);
     command
         // ssh's graphical passphrase prompt.
         .env("SSH_ASKPASS_REQUIRE", "never")
         // Git Credential Manager's sign-in window.
         .env("GCM_INTERACTIVE", "never");
-    run_with_progress(command, running, |_| {})
+    Ok(command)
 }
 
 fn run_with_progress(mut command: Command, running: &Running, mut on_progress: impl FnMut(&str)) -> Result<String, String> {
     let mut child: Child = {
         let mut slot = running.0.lock().unwrap();
-        if slot.is_some() {
+        if slot.closed {
+            return Err(crate::errors::CANCELED.into());
+        }
+        if slot.pid.is_some() {
             return Err("Another fetch, pull or push is still running.".into());
         }
         let child = command
@@ -197,7 +278,7 @@ fn run_with_progress(mut command: Command, running: &Running, mut on_progress: i
             .stderr(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Couldn't run git: {e}"))?;
-        *slot = Some(child.id());
+        slot.pid = Some(child.id());
         child
     };
 
@@ -239,7 +320,7 @@ fn run_with_progress(mut command: Command, running: &Running, mut on_progress: i
     transcript.push_str(&leftover);
 
     let status = child.wait();
-    *running.0.lock().unwrap() = None;
+    running.0.lock().unwrap().pid = None;
     let stdout = stdout_reader.join().unwrap_or_default().trim().to_string();
     let transcript = transcript.trim().to_string();
 
@@ -315,12 +396,13 @@ mod tests {
     fn checking_git_versions() {
         let check = |o| check_version(o);
         assert!(check(Some("git version 2.34.1\n")).supported);
-        assert!(check(Some("git version 2.27.0")).supported);
+        assert!(check(Some("git version 2.29.0")).supported);
+        assert!(!check(Some("git version 2.28.1")).supported);
         assert!(check(Some("git version 3.0.0")).supported);
         assert!(check(Some("git version 2.39.3 (Apple Git-145)")).supported);
         assert_eq!(check(Some("git version 2.39.3 (Apple Git-145)")).version.as_deref(), Some("2.39.3"));
         assert!(!check(Some("git version 2.25.1")).supported);
-        assert_eq!(check(None), GitCheck { version: None, minimum: "2.27".into(), supported: false });
+        assert_eq!(check(None), GitCheck { version: None, minimum: "2.29".into(), supported: false });
         assert!(!check(Some("something else")).supported);
     }
 
@@ -328,5 +410,35 @@ mod tests {
     fn the_installed_git_is_found() {
         let found = tauri::async_runtime::block_on(git_check());
         assert!(found.version.is_some() && found.supported, "{found:?}");
+    }
+
+    #[test]
+    fn unattended_git_goes_on_while_it_reports_progress_and_stops_once_it_goes_quiet() {
+        let t = crate::test_support::TempRepo::new("cli-quiet");
+        // Longer than `quiet` in all, but never quiet for anything like as long.
+        let quiet = std::time::Duration::from_secs(2);
+        let talking = ["-c", "alias.slow=!for i in 1 2 3 4 5 6 7 8; do echo working >&2; sleep 0.3; done", "slow"];
+        assert!(git_unattended_within(t.path(), &talking, quiet, &Default::default()).is_ok());
+
+        let started = std::time::Instant::now();
+        let silent = ["-c", "alias.stall=!sleep 20", "stall"];
+        assert_eq!(git_unattended_within(t.path(), &silent, quiet, &Default::default()).unwrap_err(), STALLED);
+        assert!(started.elapsed() < std::time::Duration::from_secs(10));
+
+        // Canceled, as for another pull request, rather than stalled.
+        let running = std::sync::Arc::new(Running::default());
+        let canceler = std::sync::Arc::clone(&running);
+        std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(300));
+            canceler.cancel();
+        });
+        let error = git_unattended_within(t.path(), &silent, std::time::Duration::from_secs(20), &running).unwrap_err();
+        assert_eq!(error, crate::errors::CANCELED);
+        // Canceled, it can run again; closed, nothing more starts on it.
+        assert!(git_unattended_within(t.path(), &talking, quiet, &running).is_ok());
+        running.close();
+        let started = std::time::Instant::now();
+        assert_eq!(git_unattended_within(t.path(), &silent, quiet, &running).unwrap_err(), crate::errors::CANCELED);
+        assert!(started.elapsed() < std::time::Duration::from_secs(1));
     }
 }

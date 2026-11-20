@@ -61,7 +61,7 @@ chmod +x Recastle_*.AppImage
 ./Recastle_*.AppImage
 ```
 
-Recastle needs Git 2.27 or newer and checks for it at startup. The AppImage also needs `libfuse2` on Ubuntu 22.04 and later (`libfuse2t64` on 24.04 and later).
+Recastle needs Git 2.29 or newer and checks for it at startup. The AppImage also needs `libfuse2` on Ubuntu 22.04 and later (`libfuse2t64` on 24.04 and later).
 
 ### macOS
 

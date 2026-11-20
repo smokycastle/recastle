@@ -27,6 +27,14 @@ impl TempRepo {
         Self::configured(dir.clone(), Repository::clone(remote.path(), &dir).unwrap())
     }
 
+    /// A clone of `remote` with only its newest commit, as `git clone --depth 1` makes.
+    pub fn shallow_clone_of(name: &str, remote: &TempRepo) -> Self {
+        let dir = Self::fresh_dir(name);
+        let url = format!("file://{}", remote.path());
+        crate::cli::git_in(&std::env::temp_dir(), &["clone", "-q", "--depth", "1", &url, dir.to_str().unwrap()]).unwrap();
+        Self::configured(dir.clone(), Repository::open(&dir).unwrap())
+    }
+
     fn fresh_dir(name: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!("recastle-test-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);

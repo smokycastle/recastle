@@ -193,13 +193,27 @@ pub struct CommitSearch {
     commits: Vec<FoundCommit>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct FoundCommit {
     id: String,
     short_id: String,
-    summary: String,
+    pub(crate) summary: String,
     author_name: String,
     time: i64,
+}
+
+impl FoundCommit {
+    /// The commit as a row in a list of them: its subject, who wrote it and when.
+    pub(crate) fn of(commit: &git2::Commit) -> Self {
+        let author = commit.author();
+        FoundCommit {
+            id: commit.id().to_string(),
+            short_id: commit.id().to_string()[..7].to_string(),
+            summary: commit.summary().ok().flatten().unwrap_or("").to_string(),
+            author_name: author.name().unwrap_or("").to_string(),
+            time: author.when().seconds(),
+        }
+    }
 }
 
 /// Finds the commits reachable from `rev` (HEAD when omitted), and from its upstream,
@@ -266,14 +280,7 @@ fn find_mentions(path: &str, number: u64, limit: usize) -> Result<Vec<FoundCommi
         if !mentions(commit.message().unwrap_or(""), number) {
             continue;
         }
-        let author = commit.author();
-        found.push(FoundCommit {
-            id: commit.id().to_string(),
-            short_id: commit.id().to_string()[..7].to_string(),
-            summary: commit.summary().ok().flatten().unwrap_or("").to_string(),
-            author_name: author.name().unwrap_or("").to_string(),
-            time: author.when().seconds(),
-        });
+        found.push(FoundCommit::of(&commit));
         if found.len() == limit {
             break;
         }

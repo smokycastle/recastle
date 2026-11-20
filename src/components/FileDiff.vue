@@ -30,9 +30,14 @@ const loading = ref(false);
 const root = ref(null);
 const scroller = inject("diffScroller", null);
 
-// Which diff this is, for review comments on it (see review.js).
+// Which diff this is, for review comments on it (see review.js): a comparison can say,
+// as a pull request's does, so its comments stay on it as it's pushed to.
 const where = computed(() =>
-  props.comparison ? `compare:${props.comparison.base}..${props.comparison.head}` : props.commitId ? `commit:${props.commitId}` : null,
+  props.comparison
+    ? (props.comparison.review ?? `compare:${props.comparison.base}..${props.comparison.head}`)
+    : props.commitId
+      ? `commit:${props.commitId}`
+      : null,
 );
 
 // Hidden, at no height, until there's something to slide open to: the diff, why it

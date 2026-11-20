@@ -6,7 +6,8 @@ import { keepInSync, readJson, writeJson } from "./storage.js";
 // with them here.
 //
 // Each is { id, file, where, lines, body }: `where` is the diff it's on
-// ("unstaged", "staged", "commit:<id>" or "compare:<base>..<head>"), and `lines` the
+// ("unstaged", "staged", "commit:<id>", "compare:<base>..<head>", or for all of a pull
+// request's changes, "pull:<owner>/<repo>#<number>"), and `lines` the
 // lines it's on, as the diff had them ({ kind, old, new, text }), which place it again
 // as the diff changes.
 
@@ -90,6 +91,7 @@ const MAX_QUOTED = 12;
 function whereLabel(where) {
   if (where.startsWith("commit:")) return `, in commit ${where.slice(7, 14)}`;
   if (where.startsWith("compare:")) return `, comparing ${where.slice(8).replace("..", " with ")}`;
+  if (where.startsWith("pull:")) return `, in pull request ${where.slice(5)}`;
   return "";
 }
 

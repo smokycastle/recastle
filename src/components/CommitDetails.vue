@@ -20,7 +20,8 @@ const props = defineProps({
   // The selected row from the history list; supplies the id and ref labels.
   commit: { type: Object, default: null },
   // { base, head }: in place of a commit, everything `head` changed since it split
-  // from `base`.
+  // from `base`. Given as commits, it can say what to call them, as `names: { base,
+  // head }`, and which diff its review comments are on, as `review` (see review.js).
   comparison: { type: Object, default: null },
   // A file to open and scroll to, such as the one whose history is being shown.
   focusFile: { type: String, default: null },
@@ -358,7 +359,8 @@ function splitPath(path) {
         <span>{{ changeSummary }}</span>
       </div>
       <p v-if="comparison" class="merge-note">
-        Changes made on “{{ comparison.head }}” since it split from “{{ comparison.base }}”.
+        Changes made on “{{ comparison.names?.head ?? comparison.head }}” since it split from
+        “{{ comparison.names?.base ?? comparison.base }}”.
       </p>
       <p v-else-if="details.parents.length > 1 && !stash" class="merge-note">
         This is a merge commit; changes are shown against its first parent.

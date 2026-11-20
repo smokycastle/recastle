@@ -61,6 +61,7 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .manage(history::HistoryState::default())
         .manage(cli::Runnings::default())
+        .manage(pulls::PullFetches::default())
         .manage(store::Store::default())
         .manage(watch::RepoWatcher::default())
         .manage(avatars::AvatarCache::default())
@@ -178,6 +179,7 @@ pub fn run() {
             pulls::branch_commit_messages,
             pulls::pull_request_template,
             pulls::github_merge_state,
+            pulls::pull_changes,
             pulls::github_merge_pull,
             pulls::github_ready_for_review,
             pulls::github_delete_branch,

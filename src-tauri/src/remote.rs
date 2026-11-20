@@ -119,9 +119,18 @@ fn checkout_pull_from(
         git_with_progress(path, &["fetch", "--progress", remote, branch], running, report)?;
         return crate::branch::checkout_remote_branch(path, &format!("{remote}/{branch}"));
     }
-    git_with_progress(path, &["fetch", "--progress", remote, &format!("pull/{number}/head")], running, report)?;
-    checkout_fork_pull(path, remote, number, replace)
+    // Into a ref of its own, not FETCH_HEAD, which another fetch running alongside, as
+    // one in a terminal, could write over first.
+    let fetched = format!("{FETCHED}{remote}/{number}");
+    git_with_progress(path, &["fetch", "--progress", remote, &format!("+pull/{number}/head:{fetched}")], running, report)?;
+    let done = checkout_fork_pull(path, remote, number, &fetched, replace);
+    let _ = crate::cli::git(path, &["update-ref", "-d", &fetched], None);
+    done
 }
+
+/// Where a pull request being checked out is fetched to, by remote and number, until
+/// it's checked out.
+const FETCHED: &str = "refs/recastle/fetched/";
 
 /// Where the version each pull request was brought to is noted (see checkout_fork_pull):
 /// Recastle's, and Palace's, as it was before it became Recastle, which is read where
@@ -130,16 +139,16 @@ fn checkout_pull_from(
 const NOTED: &str = "refs/recastle/pull/";
 const PALACE_NOTED: &str = "refs/palace/pull/";
 
-/// Brings pr-N to the pull request's newest version, fetched to FETCH_HEAD, and checks
+/// Brings pr-N to the pull request's newest version, fetched to `fetched`, and checks
 /// it out. Each time, the version it's brought to is noted under NOTED, out
 /// of sight of the branch list, so that when the pull request is rewritten, as when its
 /// author rebases and force-pushes, the commits on pr-N beyond that version are known
 /// to be the user's own. Without any, pr-N is replaced by the new version; with some,
 /// or none known, only with `replace`. Changes in the working copy are kept either way.
-fn checkout_fork_pull(path: &str, remote: &str, number: u64, replace: bool) -> Result<String, String> {
+fn checkout_fork_pull(path: &str, remote: &str, number: u64, fetched: &str, replace: bool) -> Result<String, String> {
     let message = |e: git2::Error| e.message().to_string();
     let repo = Repository::discover(path).map_err(message)?;
-    let tip = repo.revparse_single("FETCH_HEAD").and_then(|o| o.peel_to_commit()).map_err(message)?.id();
+    let tip = repo.revparse_single(fetched).and_then(|o| o.peel_to_commit()).map_err(message)?.id();
     let local = format!("pr-{number}");
     let noted = format!("{NOTED}{remote}/{number}");
     let noted_by_palace = format!("{PALACE_NOTED}{remote}/{number}");
@@ -1036,7 +1045,7 @@ mod tests {
         assert_eq!(result, Err(crate::errors::CANCELED.to_string()));
         assert!(started.elapsed() < Duration::from_secs(10), "took {:?}", started.elapsed());
         // The slot is free again for the next operation.
-        assert!(running.0.lock().unwrap().is_none());
+        assert!(!running.is_running());
     }
 
     #[test]

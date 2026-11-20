@@ -1,6 +1,7 @@
 import { onBeforeUnmount, ref, watch } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { NOT_A_REPOSITORY, isError } from "./errors.js";
+import { oneAtATime } from "./oneAtATime.js";
 
 /**
  * Loading the tab's repository, and refreshing it as it changes. The state is the
@@ -65,7 +66,7 @@ export function useRepository({
       if (seq !== loadSeq) return;
       // With another refresh to follow, as for files just staged, the files this one read
       // may be from before: they wait for it, rather than undo what the list shows.
-      if (quiet && refreshAgain && data.path === overview.value?.path) data.files = overview.value.files;
+      if (quiet && refreshes.pending() && data.path === overview.value?.path) data.files = overview.value.files;
       // Open elsewhere already, that tab, or window, comes forward instead.
       if (data.path !== overview.value?.path && (await openElsewhere(data.path))) return;
       if (seq !== loadSeq) return;
@@ -102,45 +103,30 @@ export function useRepository({
   }
 
   // One refresh at a time: asked for again while one is under way, as the watcher does
-  // while an agent writes files, it goes once more when that one's done, so nothing's
-  // missed, but reads don't pile up.
-  let refreshing = null;
-  let refreshAgain = false;
-
-  function refresh() {
+  // while an agent writes files, it goes once more when that one's done (see oneAtATime).
+  const refreshes = oneAtATime(async () => {
     // While a repository the user chose is still opening, a refresh would reload the one
     // on screen and, being newer, win over the switch. The window regains focus as the
     // folder picker closes, so without this, opening another repository did nothing.
     if (!overview.value || loading.value) return;
-    if (refreshing) {
-      refreshAgain = true;
-      return;
-    }
     const path = overview.value.path;
     // Another repository chosen meanwhile, as when the window comes forward as the
     // folder picker closes: opening still, or open already, which this one, reloaded or
     // said to be gone, mustn't take the place of.
     const elsewhere = () => loading.value || overview.value?.path !== path;
-    refreshing = (async () => {
-      // Its folder gone, the views keep what they last showed, rather than each failing
-      // to read it again and saying so in its place. It's looked for each time, so a
-      // folder put back is shown again.
-      const exists = await invoke("folder_exists", { path }).catch(() => true);
-      if (elsewhere()) return;
-      if (!exists) {
-        folderGone.value = true;
-        return;
-      }
-      refreshKey.value++;
-      await loadRepository(path, { quiet: true });
-    })().finally(() => {
-      refreshing = null;
-      if (refreshAgain) {
-        refreshAgain = false;
-        refresh();
-      }
-    });
-  }
+    // Its folder gone, the views keep what they last showed, rather than each failing
+    // to read it again and saying so in its place. It's looked for each time, so a
+    // folder put back is shown again.
+    const exists = await invoke("folder_exists", { path }).catch(() => true);
+    if (elsewhere()) return;
+    if (!exists) {
+      folderGone.value = true;
+      return;
+    }
+    refreshKey.value++;
+    await loadRepository(path, { quiet: true });
+  });
+  const refresh = () => refreshes.run();
 
   // The file watcher catches most changes made elsewhere; refreshing on focus also
   // catches any it misses, such as on network drives where changes aren't reported. Only

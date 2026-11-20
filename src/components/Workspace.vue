@@ -30,6 +30,7 @@ import FileTree from "./FileTree.vue";
 import GitHubView from "./GitHubView.vue";
 import IssueDetails from "./IssueDetails.vue";
 import IssueList from "./IssueList.vue";
+import PullCommits from "./PullCommits.vue";
 import Spinner from "./Spinner.vue";
 import StashList from "./StashList.vue";
 import HistoryList from "./HistoryList.vue";
@@ -82,6 +83,7 @@ import { fileManager, isMac, shortcut } from "../lib/platform.js";
 import { githubAccount } from "../lib/github.js";
 import { focusOnOpen, forgetEdits, openFiles, renameEdits } from "../lib/editing.js";
 import { githubRemoteOf } from "../lib/githubRemote.js";
+import { usePullTabs } from "../lib/pullTabs.js";
 import { issueError } from "../lib/issues.js";
 import { pullRequestPlan } from "../lib/pullRequests.js";
 import { afterResolving } from "../lib/conflictText.js";
@@ -283,6 +285,12 @@ const updatedIssue = shallowRef(null);
 const selectedPull = shallowRef(null);
 const pullQuery = ref("");
 const updatedPull = shallowRef(null);
+// Its conversation or its commits: see pullTabs.js.
+const {
+  tab: pullTab,
+  commitsOpened: pullCommitsOpened,
+  commitsShown: pullCommitsShown,
+} = usePullTabs(() => selectedPull.value?.number ?? null);
 
 const {
   issueRemotes,
@@ -1815,13 +1823,31 @@ const breadcrumb = computed(() => {
 
       <template v-else-if="isPulls">
         <div class="subheader">
-          <span class="dim">{{ selectedPull ? `#${selectedPull.number}` : "" }}</span>
-          <button v-if="selectedPull" class="link-button" @click="openUrl(selectedPull.html_url)">
-            Open on GitHub <ExternalLink :size="13" />
-          </button>
+          <div class="pull-title">
+            <span class="dim">{{ selectedPull ? `#${selectedPull.number}` : "" }}</span>
+            <button v-if="selectedPull" class="link-button" @click="openUrl(selectedPull.html_url)">
+              Open on GitHub <ExternalLink :size="13" />
+            </button>
+          </div>
+          <div v-if="selectedPull" class="segmented">
+            <button :class="{ active: pullTab === 'conversation' }" @click="pullTab = 'conversation'">Conversation</button>
+            <button :class="{ active: pullTab === 'commits' }" @click="pullTab = 'commits'">Commits</button>
+          </div>
         </div>
+        <PullCommits
+          v-if="selectedPull && issueRepo && pullCommitsOpened"
+          v-show="pullTab === 'commits'"
+          :shown="pullTab === 'commits'"
+          :path="overview.path"
+          :repo="issueRepo"
+          :number="selectedPull.number"
+          :refresh-key="refreshKey"
+          :issue-links="issueRemotes.length > 0"
+          @show-issue="showIssue"
+        />
         <IssueDetails
           v-if="selectedPull && issueRepo"
+          v-show="pullTab === 'conversation'"
           :repo="issueRepo"
           :path="overview.path"
           :issue="selectedPull"
@@ -1877,8 +1903,10 @@ const breadcrumb = computed(() => {
         </div>
       </template>
 
+      <!-- Under the diffs: everywhere they show, as a pull request's Commits tab, but not
+           its conversation or an issue's. -->
       <ReviewTray
-        v-if="!isIssues && !isPulls"
+        v-if="!isIssues && (!isPulls || pullCommitsShown)"
         :path="overview.path"
         :sending="sendingReview"
         @send="sendReview"
@@ -2137,6 +2165,13 @@ const breadcrumb = computed(() => {
 
 .subheader .link-button {
   color: var(--accent);
+}
+
+/* A pull request's number, with its link on GitHub beside it. */
+.pull-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .remote-choice:hover,
